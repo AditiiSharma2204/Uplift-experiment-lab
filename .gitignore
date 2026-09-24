@@ -1,0 +1,9 @@
+data/raw/
+data/processed/
+results/models/
+results/scores/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+.streamlit/secrets.toml
