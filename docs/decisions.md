@@ -60,3 +60,71 @@ Headline (full data, intent-to-treat):
 
 *Caution when quoting these:* the card says the data was subsampled non-uniformly so that "the original incrementality
 level cannot be deduced". The lifts are valid **for this dataset** but are not Criteo's real-world campaign lift.
+
+## Stage S2: power and variance reduction
+
+**D-11. The power test matches the test we actually run.** Two-sided pooled z-test, alpha 0.05, 80% power, 85/15 split. Power uses
+the pooled SE under H0 for the critical value and the unpooled SE under H1. MDE and required n are solved numerically from that
+same function. A first version used the textbook "baseline variance in both arms" formula and **overstated power** (conversion at 20k:
+24% analytical vs 10% simulated). With an 85/15 split the pooled rate sits near the *treated* rate, so the real null SE is
+larger. After the fix, analytical and simulated power agree within Monte Carlo error.
+
+**D-12. Simulation by exact cell counts.** A random subsample of n rows only changes the counts in the 4
+(treatment x outcome) cells, so we draw those counts from a multivariate hypergeometric (200 reps, seed 42). The result is
+identical in distribution to sampling rows, and instant at 5M. At the full size we bootstrap, because a without-replacement
+"subsample" of everything is the same data 200 times.
+
+**D-13. Power findings** (using the unadjusted full-data effect as the "true" effect):
+- visit: MDE is 1.1% relative (0.040 pp) at full size and 4.0% at 1M. 80% power needs ~25k users (57k at the adjusted effect).
+- conversion: MDE is 4.8% relative at full size and 18.8% at 1M. 80% power needs ~123k users (153k at the adjusted effect).
+- At 10k to 20k users, simulated conversion power falls *below* the analytical value (3.5% vs 8% at 10k). The control arm has only
+  3 to 6 expected conversions there, so the normal approximation behind the z-test breaks down. With that few events you
+  would use an exact test, or not run the test at all.
+
+**D-14. Covariate adjustment = Lin estimator with HC1 SEs, computed in chunks.** We wrote our own chunked OLS because 14M x 26 in
+statsmodels would need several GB for the robust covariance. It matches statsmodels HC1 to machine precision (test).
+Wording: this is **regression adjustment on anonymized pre-treatment features, not CUPED.** CUPED uses the pre-period value of
+the same metric, which this dataset does not have. Two covariate sets: (a) the 12 raw features, linear (textbook Lin);
+(b) one cross-fitted LightGBM outcome score (CUPAC-style, 2 folds, no treatment input, out-of-fold predictions only).
+
+**D-15. Variance reduction: moderate for visit, almost none for conversion.**
+
+| outcome | linear Lin | ML-score Lin |
+|---|---|---|
+| visit | **19.5%** | 23.8% |
+| conversion | 2.3% | 0.9% |
+
+Why: adjustment can only remove variance the features explain. Visit is quite predictable from f0-f11 (out-of-fold AUC
+0.947). Conversion is a 0.3% event, and most of its variance is irreducible Bernoulli noise: even among users with identical
+features, which ones convert is close to a coin flip. So the SE barely moves. A 19.5% variance reduction is worth about
+1.24x the sample size for visit.
+
+**D-16. The biggest finding of S2: adjustment moves the point estimate, which should not happen in a clean randomized test.**
+
+| visit ATE | estimate | 95% CI | shift vs unadjusted |
+|---|---|---|---|
+| unadjusted difference in means | 1.034 pp | [1.006, 1.063] | |
+| Lin, linear features | 0.773 pp | [0.748, 0.799] | -18 SE |
+| Lin, ML score | 0.665 pp | [0.640, 0.690] | -25 SE |
+| post-stratified on 20 score bins | 0.691 pp | [0.666, 0.717] | |
+
+Diagnosis (`results/figures/strata_visit.png`): the treated share is ~84.8% across most of the population but rises to
+**86.5% among users most likely to visit anyway** (visit rate ~50%). Heavy visitors are over-represented in the treated arm, which
+inflates the simple difference. This matches D-08 (the features predict treatment, AUC 0.507) and the dataset card
+(several incrementality tests, pooled and non-uniformly subsampled). Each test may be randomized, but the **pooled data is
+randomized only conditional on features**, roughly. Conversion shows the same pattern (0.115 pp unadjusted -> 0.100 pp linear, 0.102 pp ML score, 0.090 pp
+post-stratified).
+
+Consequences:
+- The unadjusted ATE from S1 is **biased upward** (about +50% for visit) and should not be the headline. The adjusted
+  estimates agree with each other (0.67 to 0.69 pp from the two flexible methods). The linear one sits in between because a
+  linear model underfits a strongly nonlinear outcome.
+- The variance-reduction percentages above are real, but the main value of adjustment here is **bias correction**.
+- S3 (uplift models): T-, S- and X-learners condition on X, so they are consistent if X captures the pooling.
+- S4/S5 (evaluation, policy): a plain Qini curve compares treated and control rates inside top-k groups, and inherits the
+  same bias. **Plan: estimate a cross-fitted propensity e(x) and use inverse-propensity-weighted uplift@k / Qini,** with the
+  plain version shown alongside as a sensitivity check.
+
+**D-17. Oddity noted, not yet explained.** In conversion's lowest score bin the observed conversion rate (0.33%) is far above bins
+2 to 10 (<0.02%). A cluster of rows seems to be mis-scored by the 2-fold model. It does not affect the visit results. We will check
+whether the S3 models show the same thing.

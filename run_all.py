@@ -47,13 +47,39 @@ def stage_s01(dev_n: int) -> None:
         print(load_results()["ate"][o]["summary"])
 
 
+def stage_s2() -> None:
+    from src import adjust, load, power
+
+    full = load.load_full()
+    update_results("data", {"n_rows_used": len(full)})
+    pw = power.run(full)
+    update_results("power", pw)
+    for o in ("visit", "conversion"):
+        print(f"\n{o}: n for 80% power at observed effect = {pw[o]['n_for_80pct_power_at_true_effect']:,}")
+        for r in pw[o]["table"]:
+            print(f"  n={r['n']:>10,}  MDE={100 * r['mde_abs']:.4f}pp ({100 * r['mde_rel']:.1f}% rel)  "
+                  f"power={r['analytical_power_at_true_effect']:.3f}  sim={r['simulated_detection_share']:.3f}")
+    adj = adjust.run(full)
+    update_results("adjust", adj)
+    for o in ("visit", "conversion"):
+        a = adj[o]
+        print(f"\n{o}: unadjusted {a['ate_unadjusted']:.6f} (SE {a['se_unadjusted']:.3g})")
+        for k in ("linear", "ml_score"):
+            r = a[k]
+            print(f"  {k:9s} ATE {r['ate_adjusted']:.6f} (SE {r['se_adjusted']:.3g})  "
+                  f"VR {r['variance_reduction_pct']:.2f}%  shift {r['ate_shift_vs_unadjusted_in_se']:+.2f} SE"
+                  + (f"  score AUC {r['score_auc']:.3f}" if "score_auc" in r else ""))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--stage", default="all", choices=["s01", "all"])
+    ap.add_argument("--stage", default="all", choices=["s01", "s2", "all"])
     ap.add_argument("--dev-n", type=int, default=1_000_000)
     args = ap.parse_args()
     if args.stage in ("s01", "all"):
         stage_s01(args.dev_n)
+    if args.stage in ("s2", "all"):
+        stage_s2()
 
 
 if __name__ == "__main__":

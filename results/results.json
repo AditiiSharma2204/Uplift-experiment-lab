@@ -274,5 +274,661 @@
       0.0010845057902364738,
       0.001219240314026782
     ]
+  },
+  "power": {
+    "alpha": 0.05,
+    "power": 0.8,
+    "sim_reps": 200,
+    "seed": 42,
+    "treat_share": 0.8500001287591226,
+    "assumed_true_effect": "full-data ATE from stage S1",
+    "visit": {
+      "baseline_rate_control": 0.03820095691954503,
+      "true_effect_abs": 0.010342403129198284,
+      "n_for_80pct_power_at_true_effect": 24597,
+      "table": [
+        {
+          "n": 10000,
+          "mde_abs": 0.016907416174068005,
+          "mde_rel": 0.44259143061983197,
+          "expected_events_control": 57.3013861921006,
+          "analytical_power_at_true_effect": 0.4079626404650071,
+          "simulated_detection_share": 0.375,
+          "simulated_mc_se": 0.03423265984407288,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 20000,
+          "mde_abs": 0.011561988899850377,
+          "mde_rel": 0.3026622847223713,
+          "expected_events_control": 114.6027723842012,
+          "analytical_power_at_true_effect": 0.7089396970086699,
+          "simulated_detection_share": 0.705,
+          "simulated_mc_se": 0.03224709289222828,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 50000,
+          "mde_abs": 0.007094304900650039,
+          "mde_rel": 0.1857101358898245,
+          "expected_events_control": 286.50693096050304,
+          "analytical_power_at_true_effect": 0.9823117166340513,
+          "simulated_detection_share": 0.99,
+          "simulated_mc_se": 0.007035623639735147,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 100000,
+          "mde_abs": 0.004939436149043038,
+          "mde_rel": 0.129301372199811,
+          "expected_events_control": 573.0138619210061,
+          "analytical_power_at_true_effect": 0.9999421443980536,
+          "simulated_detection_share": 1.0,
+          "simulated_mc_se": 0.0,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 200000,
+          "mde_abs": 0.0034544415674792354,
+          "mde_rel": 0.0904281422780751,
+          "expected_events_control": 1146.0277238420122,
+          "analytical_power_at_true_effect": 0.9999999998784885,
+          "simulated_detection_share": 1.0,
+          "simulated_mc_se": 0.0,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 1000000,
+          "mde_abs": 0.001522174045500156,
+          "mde_rel": 0.03984648993756895,
+          "expected_events_control": 5730.138619210061,
+          "analytical_power_at_true_effect": 1.0,
+          "simulated_detection_share": 1.0,
+          "simulated_mc_se": 0.0,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 5000000,
+          "mde_abs": 0.0006762210684279302,
+          "mde_rel": 0.017701678778678717,
+          "expected_events_control": 28650.6930960503,
+          "analytical_power_at_true_effect": 1.0,
+          "simulated_detection_share": 1.0,
+          "simulated_mc_se": 0.0,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 13979592,
+          "mde_abs": 0.00040353798151681285,
+          "mde_rel": 0.01056355688593622,
+          "expected_events_control": 80105.00000000001,
+          "analytical_power_at_true_effect": 1.0,
+          "simulated_detection_share": 1.0,
+          "simulated_mc_se": 0.0,
+          "simulation_sampling": "bootstrap (with replacement)"
+        }
+      ]
+    },
+    "conversion": {
+      "baseline_rate_control": 0.0019375880152813366,
+      "true_effect_abs": 0.0011518730521316279,
+      "n_for_80pct_power_at_true_effect": 123116,
+      "table": [
+        {
+          "n": 10000,
+          "mde_abs": 0.005769964457832008,
+          "mde_rel": 2.9779108935055074,
+          "expected_events_control": 2.9063795281006772,
+          "analytical_power_at_true_effect": 0.07971094636253934,
+          "simulated_detection_share": 0.035,
+          "simulated_mc_se": 0.012995191418367026,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 20000,
+          "mde_abs": 0.0035532375437462064,
+          "mde_rel": 1.8338457482821902,
+          "expected_events_control": 5.8127590562013545,
+          "analytical_power_at_true_effect": 0.15015794564712825,
+          "simulated_detection_share": 0.105,
+          "simulated_mc_se": 0.021676600286945368,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 50000,
+          "mde_abs": 0.001970197485725683,
+          "mde_rel": 1.0168299298855912,
+          "expected_events_control": 14.531897640503388,
+          "analytical_power_at_true_effect": 0.38242320417032066,
+          "simulated_detection_share": 0.435,
+          "simulated_mc_se": 0.03505531343462785,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 100000,
+          "mde_abs": 0.0012997755593551837,
+          "mde_rel": 0.6708214280353386,
+          "expected_events_control": 29.063795281006776,
+          "analytical_power_at_true_effect": 0.7023062266351594,
+          "simulated_detection_share": 0.715,
+          "simulated_mc_se": 0.03191982142807193,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 200000,
+          "mde_abs": 0.0008740717560601638,
+          "mde_rel": 0.4511133167456391,
+          "expected_events_control": 58.12759056201355,
+          "analytical_power_at_true_effect": 0.9559102125565088,
+          "simulated_detection_share": 0.95,
+          "simulated_mc_se": 0.015411035007422448,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 1000000,
+          "mde_abs": 0.0003650524498524459,
+          "mde_rel": 0.18840560891859176,
+          "expected_events_control": 290.63795281006776,
+          "analytical_power_at_true_effect": 0.9999999999862844,
+          "simulated_detection_share": 1.0,
+          "simulated_mc_se": 0.0,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 5000000,
+          "mde_abs": 0.00015826211604866723,
+          "mde_rel": 0.08167996230389961,
+          "expected_events_control": 1453.1897640503387,
+          "analytical_power_at_true_effect": 1.0,
+          "simulated_detection_share": 1.0,
+          "simulated_mc_se": 0.0,
+          "simulation_sampling": "subsample without replacement"
+        },
+        {
+          "n": 13979592,
+          "mde_abs": 9.369167012264542e-05,
+          "mde_rel": 0.04835479440609641,
+          "expected_events_control": 4063.0000000000005,
+          "analytical_power_at_true_effect": 1.0,
+          "simulated_detection_share": 1.0,
+          "simulated_mc_se": 0.0,
+          "simulation_sampling": "bootstrap (with replacement)"
+        }
+      ]
+    },
+    "sensitivity_adjusted_effect": {
+      "visit": {
+        "effect_used": 0.006650511700265211,
+        "n_for_80pct_power": 56540
+      },
+      "conversion": {
+        "effect_used": 0.0010173942322904454,
+        "n_for_80pct_power": 152888
+      }
+    }
+  },
+  "adjust": {
+    "method": "Lin (2013): y ~ t + Xc + t:Xc, HC1 robust SE",
+    "n": 13979592,
+    "visit": {
+      "ate_unadjusted": 0.010342403129198294,
+      "se_unadjusted": 0.0001463164314550805,
+      "ci_unadjusted": [
+        0.010055628193199913,
+        0.010629178065196676
+      ],
+      "linear": {
+        "ate_adjusted": 0.007733801746084711,
+        "se_adjusted": 0.00013125542934437208,
+        "ci_adjusted": [
+          0.0074765458317944,
+          0.007991057660375021
+        ],
+        "variance_reduction_pct": 19.527340774498093,
+        "se_reduction_pct": 10.293445487243291,
+        "equivalent_sample_size_multiplier": 1.242658077444393,
+        "r2_outcome_explained": 0.2810470995489608,
+        "ate_shift_vs_unadjusted_in_se": -17.828492378960394
+      },
+      "ml_score": {
+        "ate_adjusted": 0.006650511700265211,
+        "se_adjusted": 0.00012773622405908442,
+        "ci_adjusted": [
+          0.006400153301588267,
+          0.006900870098942155
+        ],
+        "variance_reduction_pct": 23.7847379569631,
+        "se_reduction_pct": 12.698647179418288,
+        "equivalent_sample_size_multiplier": 1.3120731638176673,
+        "r2_outcome_explained": 0.3351888667978765,
+        "ate_shift_vs_unadjusted_in_se": -25.232240782652653,
+        "score_auc": 0.9466900953619017
+      },
+      "poststratified": {
+        "ate_poststratified": 0.006914285050808601,
+        "se": 0.00012987384259406033,
+        "ci": [
+          0.006659736996790419,
+          0.007168833104826784
+        ],
+        "n_strata": 20,
+        "treat_share_min": 0.8461503236922091,
+        "treat_share_max": 0.8650490715041919,
+        "spearman_score_vs_treat_share": 0.22406015037593985,
+        "table": [
+          {
+            "stratum": 0,
+            "n": 661818,
+            "treat_share": 0.8498484477605626,
+            "rate_treated": 0.00039648321169180985,
+            "rate_control": 0.0003220190595030843,
+            "diff": 7.446415218872554e-05,
+            "mean_score": 0.0004027292386470252
+          },
+          {
+            "stratum": 1,
+            "n": 734230,
+            "treat_share": 0.8496751699058878,
+            "rate_treated": 0.0005193497868902649,
+            "rate_control": 0.0003805278464841945,
+            "diff": 0.00013882194040607036,
+            "mean_score": 0.0004830016974065832
+          },
+          {
+            "stratum": 2,
+            "n": 700740,
+            "treat_share": 0.8488997345663156,
+            "rate_treated": 0.0004942355990841512,
+            "rate_control": 0.0004533348444494815,
+            "diff": 4.090075463466971e-05,
+            "mean_score": 0.0005440483024559368
+          },
+          {
+            "stratum": 3,
+            "n": 696702,
+            "treat_share": 0.8489827788638471,
+            "rate_treated": 0.0005951092837048258,
+            "rate_control": 0.0005037352443591157,
+            "diff": 9.137403934571014e-05,
+            "mean_score": 0.0005852057755718382
+          },
+          {
+            "stratum": 4,
+            "n": 700878,
+            "treat_share": 0.8485756436926255,
+            "rate_treated": 0.0006977745196284813,
+            "rate_control": 0.0004899651370960143,
+            "diff": 0.00020780938253246695,
+            "mean_score": 0.0006535679321348976
+          },
+          {
+            "stratum": 5,
+            "n": 692719,
+            "treat_share": 0.8477116983942984,
+            "rate_treated": 0.0008787076866487519,
+            "rate_control": 0.0006825097399827477,
+            "diff": 0.00019619794666600422,
+            "mean_score": 0.0007811388604872599
+          },
+          {
+            "stratum": 6,
+            "n": 705738,
+            "treat_share": 0.8485443606550873,
+            "rate_treated": 0.0009150872505635802,
+            "rate_control": 0.0006642466881221466,
+            "diff": 0.0002508405624414336,
+            "mean_score": 0.0009538620675569141
+          },
+          {
+            "stratum": 7,
+            "n": 698673,
+            "treat_share": 0.8489980291209193,
+            "rate_treated": 0.0012829331121495958,
+            "rate_control": 0.0008720296490080662,
+            "diff": 0.0004109034631415296,
+            "mean_score": 0.0012243759972847066
+          },
+          {
+            "stratum": 8,
+            "n": 699256,
+            "treat_share": 0.8490066585056116,
+            "rate_treated": 0.0017787569924857625,
+            "rate_control": 0.0011839027116107707,
+            "diff": 0.0005948542808749918,
+            "mean_score": 0.0016915681343344527
+          },
+          {
+            "stratum": 9,
+            "n": 698233,
+            "treat_share": 0.8478645380553483,
+            "rate_treated": 0.002734764960549453,
+            "rate_control": 0.0019016060098281024,
+            "diff": 0.0008331589507213507,
+            "mean_score": 0.002512278527477879
+          },
+          {
+            "stratum": 10,
+            "n": 698176,
+            "treat_share": 0.847019949124576,
+            "rate_treated": 0.0038503878289189997,
+            "rate_control": 0.003164586590766523,
+            "diff": 0.0006858012381524767,
+            "mean_score": 0.003623844272691524
+          },
+          {
+            "stratum": 11,
+            "n": 698812,
+            "treat_share": 0.8461503236922091,
+            "rate_treated": 0.004794520547945206,
+            "rate_control": 0.003850732941439095,
+            "diff": 0.0009437876065061107,
+            "mean_score": 0.004700774518856559
+          },
+          {
+            "stratum": 12,
+            "n": 700760,
+            "treat_share": 0.8469547348592956,
+            "rate_treated": 0.006274515089838117,
+            "rate_control": 0.004913844547217664,
+            "diff": 0.0013606705426204525,
+            "mean_score": 0.006210564645983283
+          },
+          {
+            "stratum": 13,
+            "n": 698384,
+            "treat_share": 0.8473490228871222,
+            "rate_treated": 0.009545857800684381,
+            "rate_control": 0.007691658302769935,
+            "diff": 0.0018541994979144466,
+            "mean_score": 0.009039322762009543
+          },
+          {
+            "stratum": 14,
+            "n": 698855,
+            "treat_share": 0.8482789706019132,
+            "rate_treated": 0.014481532461573755,
+            "rate_control": 0.011345738510435627,
+            "diff": 0.003135793951138128,
+            "mean_score": 0.014150810609830535
+          },
+          {
+            "stratum": 15,
+            "n": 699699,
+            "treat_share": 0.8496324848256178,
+            "rate_treated": 0.023220019949973674,
+            "rate_control": 0.0194939740713987,
+            "diff": 0.003726045878574974,
+            "mean_score": 0.022865893536668097
+          },
+          {
+            "stratum": 16,
+            "n": 698979,
+            "treat_share": 0.8506307056435172,
+            "rate_treated": 0.044293972312903544,
+            "rate_control": 0.03362833553627186,
+            "diff": 0.010665636776631682,
+            "mean_score": 0.04220580546835499
+          },
+          {
+            "stratum": 17,
+            "n": 698980,
+            "treat_share": 0.8535723482789207,
+            "rate_treated": 0.09653889345155289,
+            "rate_control": 0.07643380556912555,
+            "diff": 0.020105087882427347,
+            "mean_score": 0.09188978109103063
+          },
+          {
+            "stratum": 18,
+            "n": 698980,
+            "treat_share": 0.8572620103579501,
+            "rate_treated": 0.22388849299660052,
+            "rate_control": 0.18747932766034217,
+            "diff": 0.03640916533625835,
+            "mean_score": 0.2186455905841454
+          },
+          {
+            "stratum": 19,
+            "n": 698980,
+            "treat_share": 0.8650490715041919,
+            "rate_treated": 0.5222045077168355,
+            "rate_control": 0.4656517682978543,
+            "diff": 0.056552739418981146,
+            "mean_score": 0.5170111964485969
+          }
+        ]
+      }
+    },
+    "conversion": {
+      "ate_unadjusted": 0.0011518730521316287,
+      "se_unadjusted": 3.437168603377934e-05,
+      "ci_unadjusted": [
+        0.0010845057854175029,
+        0.0012192403188457546
+      ],
+      "linear": {
+        "ate_adjusted": 0.0010016583671257388,
+        "se_adjusted": 3.3976003304441764e-05,
+        "ci_adjusted": [
+          0.000935066624310419,
+          0.0010682501099410584
+        ],
+        "variance_reduction_pct": 2.289123686728578,
+        "se_reduction_pct": 1.1511880125656626,
+        "equivalent_sample_size_multiplier": 1.0234275218184452,
+        "r2_outcome_explained": 0.11984155162920163,
+        "ate_shift_vs_unadjusted_in_se": -4.370303070331319
+      },
+      "ml_score": {
+        "ate_adjusted": 0.0010173942322904454,
+        "se_adjusted": 3.421955689009751e-05,
+        "ci_adjusted": [
+          0.0009503251332189348,
+          0.001084463331361956
+        ],
+        "variance_reduction_pct": 0.8832414074889106,
+        "se_reduction_pct": 0.442600178333763,
+        "equivalent_sample_size_multiplier": 1.0089111207835204,
+        "r2_outcome_explained": 0.08193598461332718,
+        "ate_shift_vs_unadjusted_in_se": -3.91248831113557,
+        "score_auc": 0.8999744987270165
+      },
+      "poststratified": {
+        "ate_poststratified": 0.0009039386551195215,
+        "se": 3.662919188006475e-05,
+        "ci": [
+          0.0008321467582517876,
+          0.0009757305519872554
+        ],
+        "n_strata": 20,
+        "treat_share_min": 0.8467275050817802,
+        "treat_share_max": 0.8680405734069644,
+        "spearman_score_vs_treat_share": 0.11127819548872178,
+        "table": [
+          {
+            "stratum": 0,
+            "n": 695846,
+            "treat_share": 0.8491649014293392,
+            "rate_treated": 0.003330580414562489,
+            "rate_control": 0.0026105680367385048,
+            "diff": 0.0007200123778239842,
+            "mean_score": 3.323384427437653e-05
+          },
+          {
+            "stratum": 1,
+            "n": 700054,
+            "treat_share": 0.8488030923328772,
+            "rate_treated": 7.573105713824116e-05,
+            "rate_control": 2.8343064452128563e-05,
+            "diff": 4.738799268611259e-05,
+            "mean_score": 4.466495760106257e-05
+          },
+          {
+            "stratum": 2,
+            "n": 698739,
+            "treat_share": 0.8492570187151426,
+            "rate_treated": 7.414784743743355e-05,
+            "rate_control": 2.8481913984619766e-05,
+            "diff": 4.566593345281378e-05,
+            "mean_score": 4.774048939172335e-05
+          },
+          {
+            "stratum": 3,
+            "n": 700091,
+            "treat_share": 0.8489210688324803,
+            "rate_treated": 7.235135162420371e-05,
+            "rate_control": 4.7272830413448174e-05,
+            "diff": 2.5078521210755537e-05,
+            "mean_score": 5.0292186494889124e-05
+          },
+          {
+            "stratum": 4,
+            "n": 696869,
+            "treat_share": 0.8486343918297413,
+            "rate_treated": 5.411008358316973e-05,
+            "rate_control": 4.740145238050094e-05,
+            "diff": 6.708631202668791e-06,
+            "mean_score": 5.255519575035981e-05
+          },
+          {
+            "stratum": 5,
+            "n": 698989,
+            "treat_share": 0.8489189386385193,
+            "rate_treated": 5.898362783016086e-05,
+            "rate_control": 6.628536797848566e-05,
+            "diff": -7.301740148324801e-06,
+            "mean_score": 5.52334009651784e-05
+          },
+          {
+            "stratum": 6,
+            "n": 699263,
+            "treat_share": 0.8483245931788183,
+            "rate_treated": 7.754525439900742e-05,
+            "rate_control": 4.7142682041466704e-05,
+            "diff": 3.040257235754072e-05,
+            "mean_score": 5.9110709074850886e-05
+          },
+          {
+            "stratum": 7,
+            "n": 701980,
+            "treat_share": 0.8485597880281489,
+            "rate_treated": 0.00010744167931344767,
+            "rate_control": 2.8219889378033637e-05,
+            "diff": 7.922178993541404e-05,
+            "mean_score": 6.554391840042715e-05
+          },
+          {
+            "stratum": 8,
+            "n": 698777,
+            "treat_share": 0.8482305513776212,
+            "rate_treated": 0.00012653444098771098,
+            "rate_control": 0.00010372172404363855,
+            "diff": 2.2812716944072426e-05,
+            "mean_score": 7.6405681553259e-05
+          },
+          {
+            "stratum": 9,
+            "n": 698073,
+            "treat_share": 0.8487550728935226,
+            "rate_treated": 0.0001991584710705443,
+            "rate_control": 6.630043568857738e-05,
+            "diff": 0.0001328580353819669,
+            "mean_score": 9.213651100525814e-05
+          },
+          {
+            "stratum": 10,
+            "n": 699132,
+            "treat_share": 0.847622480447183,
+            "rate_treated": 0.00018562267971650355,
+            "rate_control": 0.00014080276348890473,
+            "diff": 4.4819916227598815e-05,
+            "mean_score": 0.0001192747973415751
+          },
+          {
+            "stratum": 11,
+            "n": 699558,
+            "treat_share": 0.8467275050817802,
+            "rate_treated": 0.0001992115947901103,
+            "rate_control": 0.00015854807270828088,
+            "diff": 4.066352208182943e-05,
+            "mean_score": 0.000160041197373069
+          },
+          {
+            "stratum": 12,
+            "n": 699364,
+            "treat_share": 0.8467865088852157,
+            "rate_treated": 0.00033096256070461253,
+            "rate_control": 0.00017731820218008063,
+            "diff": 0.0001536443585245319,
+            "mean_score": 0.00021373345487036503
+          },
+          {
+            "stratum": 13,
+            "n": 698487,
+            "treat_share": 0.847736607839516,
+            "rate_treated": 0.00044246816171366905,
+            "rate_control": 0.0003290896440190308,
+            "diff": 0.00011337851769463827,
+            "mean_score": 0.00030003479909504694
+          },
+          {
+            "stratum": 14,
+            "n": 699462,
+            "treat_share": 0.8481704510037714,
+            "rate_treated": 0.0006152414696348837,
+            "rate_control": 0.0004143165189879377,
+            "diff": 0.00020092495064694599,
+            "mean_score": 0.00045547521898149754
+          },
+          {
+            "stratum": 15,
+            "n": 698989,
+            "treat_share": 0.8486828834216276,
+            "rate_treated": 0.0008226290415023095,
+            "rate_control": 0.0005483648327959988,
+            "diff": 0.00027426420870631067,
+            "mean_score": 0.000701812839351911
+          },
+          {
+            "stratum": 16,
+            "n": 698976,
+            "treat_share": 0.849361065329854,
+            "rate_treated": 0.0015496485498153055,
+            "rate_control": 0.0009212388287920375,
+            "diff": 0.000628409721023268,
+            "mean_score": 0.0011460951358933265
+          },
+          {
+            "stratum": 17,
+            "n": 698982,
+            "treat_share": 0.8518402476744752,
+            "rate_treated": 0.002532661763693252,
+            "rate_control": 0.001680169175654928,
+            "diff": 0.0008524925880383242,
+            "mean_score": 0.002093769373470532
+          },
+          {
+            "stratum": 18,
+            "n": 698981,
+            "treat_share": 0.8574696594041898,
+            "rate_treated": 0.005599352637418558,
+            "rate_control": 0.0034629514383795394,
+            "diff": 0.002136401199039019,
+            "mean_score": 0.004523544401590947
+          },
+          {
+            "stratum": 19,
+            "n": 698980,
+            "treat_share": 0.8680405734069644,
+            "rate_treated": 0.04436474751253826,
+            "rate_control": 0.0318310439411516,
+            "diff": 0.01253370357138666,
+            "mean_score": 0.04797257900942358
+          }
+        ]
+      }
+    },
+    "variance_reduction_pct": 19.527340774498093,
+    "variance_reduction_pct_ml_score": 23.7847379569631
   }
 }
