@@ -183,3 +183,66 @@ was run with seed 42 first (about 16 min per seed on this laptop). Seeds 43 and 
   the textbook "sure things" story suggests. S4 decides whether the uplift models beat it by more than noise.
 - Validation Qini AUC (for information only; not used for selection, and not propensity-corrected): X 0.092, S 0.089,
   response 0.086, T 0.079.
+
+## Stage S4: honest evaluation (test set, 4,193,878 users, first use of test outcomes)
+
+**D-24. Metric definition.** Uplift-curve form of Qini: gain(k) = (n_k/N) x [P(visit | treated, top k) - P(visit | control, top k)],
+i.e. the incremental visits (per user of the whole population, reported per 1M) if exactly the top k% were treated. It ranks
+models the same way as the classic Qini (Y_T - Y_C x N_T/N_C) but is already in policy units for S5. AUUC = area between
+gain(k) and the random line k x gain(100%). The grid runs from 0.5% to 100% in 0.5% steps. Scores are averaged over the 3 seeds.
+
+**D-25. Propensity-weighted (primary) and unweighted (sensitivity).** Arm rates inside each top-k group are Hajek IPW means
+with the seed-averaged e(x) clipped to [0.01, 0.99]. On synthetic data with planted confounding, IPW recovers the true effect and
+the naive estimate does not (tests/test_evaluate.py). On the real test set IPW moves the overall effect from about 1.03 pp
+(unweighted) to **0.759 pp [0.704, 0.817]**. That removes roughly 3/4 of the gap to the Lin/post-stratified estimates (0.665 to
+0.691 pp), but not all of it. The propensity model is weak (AUC 0.511), and IPW can only correct what e(x) captures. Every
+unweighted AUUC is ~15% higher than its weighted version: the naive evaluation flatters every model.
+
+**D-26. Bootstrap.** 200 Poisson(1) replicates, seed 42. All models share each replicate, so model differences are paired.
+Percentile 95% CIs. For "is model A better than model B" we use a Bonferroni-corrected interval over the 6 learner
+pairs (normal approximation with the bootstrap SE), to be conservative.
+
+**D-27. Sanity check passed.** A random score run through the same pipeline gets AUUC -132 per 1M, 95% CI [-294, +26], which covers 0.
+(Its point estimate is slightly negative. That is sampling noise: the CI includes 0, and the uplift@k CIs vs random all include 0 too.)
+
+**D-28. Results (visit, propensity-weighted, AUUC in incremental visits per 1M users above random):**
+
+| model | AUUC per 1M | 95% CI | uplift@5% | uplift@10% | uplift@20% | uplift@30% |
+|---|---|---|---|---|---|---|
+| X-learner | **3,298** | [3,066, 3,549] | 9.6 pp | 6.2 pp | 3.5 pp | 2.4 pp |
+| S-learner | 3,350 | [3,147, 3,580] | 9.4 pp | 6.1 pp | 3.5 pp | 2.5 pp |
+| Response | 3,109 | [2,909, 3,367] | 6.2 pp | 5.2 pp | 3.4 pp | 2.4 pp |
+| T-learner | 3,061 | [2,825, 3,301] | 9.0 pp | 5.8 pp | 3.4 pp | 2.4 pp |
+| Random score | -132 | [-294, +26] | 0.6 pp | 0.6 pp | 0.7 pp | 0.7 pp |
+
+(Overall uplift on the test set = 0.76 pp, so random targeting gets ~0.76 pp at every k.)
+
+Pairwise, Bonferroni-corrected:
+- **Distinguishable:** S > response; S > T; X > T.
+- **Within noise:** S vs X; X vs response (the interval just includes 0: [-412, +34] per 1M); response vs T.
+
+**D-29. Best model = X-learner, chosen on validation, not on test.** The selection rule was fixed before the test set was read:
+the highest mean validation Qini across seeds. X won in every seed (mean 0.0914 vs S 0.0887, response 0.0856, T 0.0801). On test,
+X and S are statistically tied (S's point estimate is 51 per 1M higher, CI [-109, +212]). We don't switch to S because of a
+test-set win, since that would be selecting on the test set. X also has the most stable ranking across seeds (Spearman 0.95 vs S 0.92, T 0.81).
+The first version of `evaluate.run` picked the best test AUUC; this was fixed before reporting.
+
+**D-30. The response model is not the right tool, but the difference shows up at the top of the ranking, not in AUUC.**
+- AUUC over the whole curve is similar (response 3,109 vs X 3,298), because on this data the absolute uplift grows with the
+  baseline visit rate, so both rankings eventually find the same people.
+- **Where budgets actually bind (small k), the gap is large and clearly outside noise:** uplift@5% is 6.2 pp [5.4, 6.8] for response
+  vs 9.6 pp [9.0, 10.2] for X-learner, about 55% more incremental visits per treated user.
+- Who each model picks (top 10%): response picks users with a **32% control visit rate**, and only **14%** of their visits under
+  treatment are incremental. X picks users with a 22% control rate, and **22%** of their visits are incremental. That is the "sure
+  things" effect: the response model spends budget on people who would have visited anyway.
+
+**D-31. Where the value is.** All curves flatten after ~30 to 40% targeted. Treating the top ~35% by X-learner captures essentially all
+of the incremental visits the campaign produces (gain ~7,600 per 1M, same as treating everyone). The bottom ~60% contributes
+nothing measurable. This is the key input for the S5 cost/value analysis.
+
+**D-32. Secondary outcome (conversion), same visit-trained rankings.** Every learner beats random on conversion AUUC (per 1M:
+response 440 [381, 516], S 426, X 412, T 316; random -3 [-42, +34]). Differences between learners are within noise, except that T is
+lowest. We did not train conversion-specific models (D-19).
+
+**D-33. Seed averaging helps a little.** Single-seed AUUC for the S-learner ranges from 3,249 to 3,390 per 1M; the 3-seed average scores 3,350.
+The T-learner varies most across seeds, consistent with its noisy control-arm model.

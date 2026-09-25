@@ -258,7 +258,18 @@ def curves_payload(res: dict) -> dict:
     return out
 
 
+def select_on_validation(uplift_section: dict) -> tuple[str, dict]:
+    """Best learner = highest mean validation Qini AUC across seeds (chosen before looking at test)."""
+    per_seed = uplift_section["per_seed"]
+    mean_val = {m: float(np.mean([s["val_qini_auc"][m] for s in per_seed.values()])) for m in LEARNERS}
+    uplift_learners = {m: v for m, v in mean_val.items() if m != "response"}
+    return max(uplift_learners, key=uplift_learners.get), mean_val
+
+
 def run(tag: str = "full") -> tuple[dict, dict]:
+    from .common import load_results
+
+    section = load_results()["uplift" if tag == "full" else "uplift_dev"]
     test, seeds = load_test(tag)
     res = evaluate(test, seeds, weighted=True, keep_replicates=True)
     res_unw = evaluate(test, seeds, weighted=False)
@@ -273,8 +284,8 @@ def run(tag: str = "full") -> tuple[dict, dict]:
     curves = curves_payload(res)
     res.pop("_replicates")
 
-    learners = {m: res["models"][m] for m in LEARNERS}
-    best = max(learners, key=lambda m: learners[m]["auuc"])
+    best, mean_val = select_on_validation(section)
+    best_on_test = max(LEARNERS, key=lambda m: res["models"][m]["auuc"])
     out = {
         "primary": res,
         "unweighted": {m: {k: v for k, v in r.items() if k in ("auuc", "auuc_ci", "better_than_random")}
@@ -285,5 +296,8 @@ def run(tag: str = "full") -> tuple[dict, dict]:
         "top10_profile": top_k_profile(test, seeds, 0.10),
         "per_seed_auuc": per_seed_auuc(test, seeds),
         "best_model": best,
+        "best_model_rule": "highest mean validation Qini AUC across seeds (uplift learners only); test not used",
+        "validation_qini_auc_mean": mean_val,
+        "best_on_test_auuc": best_on_test,
     }
     return out, curves
