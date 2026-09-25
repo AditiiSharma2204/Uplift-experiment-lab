@@ -237,10 +237,10 @@
       ],
       "summary": "The campaign changed the visit rate by +1.034 percentage points (95% CI [+1.006, +1.063]), from 3.820% in control to 4.854% in treated - a relative lift of +27.1% (95% CI [+26.2%, +28.0%]). That is about 10,342 extra visits per 1M treated users (95% CI [10,056, 10,629]); statistically significant (p < 1e-300)."
     },
-    "visit_abs": 0.010342403129198284,
+    "visit_abs": 0.006650511700265211,
     "visit_ci": [
-      0.010055628213713731,
-      0.010629178044682837
+      0.006400153301588267,
+      0.006900870098942155
     ],
     "conversion": {
       "n_treated": 11882655,
@@ -269,11 +269,24 @@
       ],
       "summary": "The campaign changed the conversion rate by +0.115 percentage points (95% CI [+0.108, +0.122]), from 0.194% in control to 0.309% in treated - a relative lift of +59.4% (95% CI [+54.4%, +64.7%]). That is about 1,152 extra conversions per 1M treated users (95% CI [1,085, 1,219]); statistically significant (p = 7.3e-179)."
     },
-    "conversion_abs": 0.0011518730521316279,
+    "conversion_abs": 0.0010173942322904454,
     "conversion_ci": [
-      0.0010845057902364738,
-      0.001219240314026782
-    ]
+      0.0009503251332189348,
+      0.001084463331361956
+    ],
+    "headline_method": "Lin estimator with cross-fitted LightGBM outcome score (see D-16, D-18)",
+    "visit_abs_naive": 0.010342403129198294,
+    "visit_ci_naive": [
+      0.010055628193199913,
+      0.010629178065196676
+    ],
+    "visit_rel_adjusted": 0.1740928038601714,
+    "conversion_abs_naive": 0.0011518730521316287,
+    "conversion_ci_naive": [
+      0.0010845057854175029,
+      0.0012192403188457546
+    ],
+    "conversion_rel_adjusted": 0.5250828474714323
   },
   "power": {
     "alpha": 0.05,
@@ -930,5 +943,418 @@
     },
     "variance_reduction_pct": 19.527340774498093,
     "variance_reduction_pct_ml_score": 23.7847379569631
+  },
+  "uplift_dev": {
+    "outcome": "visit",
+    "data_tag": "dev",
+    "n_rows": 1000001,
+    "split_sizes": {
+      "train": 600002,
+      "val": 99999,
+      "test": 300000
+    },
+    "split": {
+      "fractions": {
+        "train": 0.6,
+        "val": 0.1,
+        "test": 0.3
+      },
+      "stratified_by": [
+        "treatment",
+        "visit",
+        "conversion"
+      ],
+      "seed": 42
+    },
+    "lightgbm_fixed": {
+      "learning_rate": 0.1,
+      "n_estimators": 1000,
+      "subsample": 0.8,
+      "subsample_freq": 1,
+      "colsample_bytree": 0.9,
+      "reg_lambda": 1.0,
+      "verbose": -1,
+      "n_jobs": -1
+    },
+    "tuning": {
+      "chosen": {
+        "num_leaves": 31,
+        "min_child_samples": 2000
+      },
+      "grid": [
+        {
+          "num_leaves": 31,
+          "min_child_samples": 200,
+          "val_logloss": 0.10359661868782262,
+          "best_iteration": 65,
+          "seconds": 2.8
+        },
+        {
+          "num_leaves": 127,
+          "min_child_samples": 200,
+          "val_logloss": 0.1039734100055484,
+          "best_iteration": 47,
+          "seconds": 3.9
+        },
+        {
+          "num_leaves": 31,
+          "min_child_samples": 2000,
+          "val_logloss": 0.10353308801079732,
+          "best_iteration": 64,
+          "seconds": 3.5
+        },
+        {
+          "num_leaves": 127,
+          "min_child_samples": 2000,
+          "val_logloss": 0.10360044992913246,
+          "best_iteration": 48,
+          "seconds": 4.9
+        }
+      ],
+      "tuned_on_rows": 600002
+    },
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "per_seed": {
+      "42": {
+        "best_iterations": {
+          "response": {
+            "m_best_iteration": 64
+          },
+          "t_learner": {
+            "mu1_best_iteration": 64,
+            "mu0_best_iteration": 57
+          },
+          "s_learner": {
+            "m_best_iteration": 79
+          },
+          "x_learner": {
+            "tau1_best_iteration": 68,
+            "tau0_best_iteration": 89
+          },
+          "propensity": {
+            "m_best_iteration": 19
+          }
+        },
+        "fit_seconds": {
+          "propensity": 4.5,
+          "response": 6.4,
+          "t_learner": 6.7,
+          "s_learner": 7.2,
+          "x_learner": 8.2
+        },
+        "val_qini_auc": {
+          "response": 0.08982936040999706,
+          "t_learner": 0.08880231425419412,
+          "s_learner": 0.08798338956833399,
+          "x_learner": 0.08400465257014622
+        },
+        "val_mean_score": {
+          "response": 0.04737990474367267,
+          "t_learner": 0.0074992308602882815,
+          "s_learner": 0.006869525798387858,
+          "x_learner": 0.007316093946358073
+        },
+        "val_propensity_auc": 0.5101225057549696
+      },
+      "43": {
+        "best_iterations": {
+          "response": {
+            "m_best_iteration": 81
+          },
+          "t_learner": {
+            "mu1_best_iteration": 67,
+            "mu0_best_iteration": 56
+          },
+          "s_learner": {
+            "m_best_iteration": 64
+          },
+          "x_learner": {
+            "tau1_best_iteration": 106,
+            "tau0_best_iteration": 103
+          },
+          "propensity": {
+            "m_best_iteration": 13
+          }
+        },
+        "fit_seconds": {
+          "propensity": 4.1,
+          "response": 7.0,
+          "t_learner": 7.1,
+          "s_learner": 6.4,
+          "x_learner": 9.7
+        },
+        "val_qini_auc": {
+          "response": 0.08976783081808469,
+          "t_learner": 0.06994899590877507,
+          "s_learner": 0.0969426670899062,
+          "x_learner": 0.08391186980958314
+        },
+        "val_mean_score": {
+          "response": 0.04728893187230581,
+          "t_learner": 0.007587327089055381,
+          "s_learner": 0.006737615557753229,
+          "x_learner": 0.007433508035137971
+        },
+        "val_propensity_auc": 0.5115150609615016
+      },
+      "44": {
+        "best_iterations": {
+          "response": {
+            "m_best_iteration": 81
+          },
+          "t_learner": {
+            "mu1_best_iteration": 69,
+            "mu0_best_iteration": 55
+          },
+          "s_learner": {
+            "m_best_iteration": 84
+          },
+          "x_learner": {
+            "tau1_best_iteration": 57,
+            "tau0_best_iteration": 85
+          },
+          "propensity": {
+            "m_best_iteration": 16
+          }
+        },
+        "fit_seconds": {
+          "propensity": 3.7,
+          "response": 6.9,
+          "t_learner": 7.0,
+          "s_learner": 7.8,
+          "x_learner": 7.9
+        },
+        "val_qini_auc": {
+          "response": 0.08937235223345336,
+          "t_learner": 0.07783755548316652,
+          "s_learner": 0.08882948336427009,
+          "x_learner": 0.08829861072557839
+        },
+        "val_mean_score": {
+          "response": 0.047273795391786035,
+          "t_learner": 0.007504970713619973,
+          "s_learner": 0.0072183280353625145,
+          "x_learner": 0.007342816524271059
+        },
+        "val_propensity_auc": 0.509376369525916
+      }
+    },
+    "test_rank_correlation_seed0": {
+      "response": {
+        "response": 1.0,
+        "t_learner": 0.456,
+        "s_learner": 0.717,
+        "x_learner": 0.484
+      },
+      "t_learner": {
+        "response": 0.456,
+        "t_learner": 1.0,
+        "s_learner": 0.645,
+        "x_learner": 0.643
+      },
+      "s_learner": {
+        "response": 0.717,
+        "t_learner": 0.645,
+        "s_learner": 1.0,
+        "x_learner": 0.635
+      },
+      "x_learner": {
+        "response": 0.484,
+        "t_learner": 0.643,
+        "s_learner": 0.635,
+        "x_learner": 1.0
+      }
+    },
+    "test_seed_stability_spearman": {
+      "response": 0.9944247279701838,
+      "t_learner": 0.8224216145729254,
+      "s_learner": 0.8382565898689744,
+      "x_learner": 0.897531629827018
+    },
+    "test_mean_predicted_uplift": {
+      "t_learner": 0.007467552553862333,
+      "s_learner": 0.00689346669241786,
+      "x_learner": 0.0073093874379992485
+    },
+    "scores_file": "results\\scores\\test_scores_dev.parquet",
+    "test_rank_correlation_first_seed": {
+      "response": {
+        "response": 1.0,
+        "t_learner": 0.456,
+        "s_learner": 0.717,
+        "x_learner": 0.484
+      },
+      "t_learner": {
+        "response": 0.456,
+        "t_learner": 1.0,
+        "s_learner": 0.645,
+        "x_learner": 0.643
+      },
+      "s_learner": {
+        "response": 0.717,
+        "t_learner": 0.645,
+        "s_learner": 1.0,
+        "x_learner": 0.635
+      },
+      "x_learner": {
+        "response": 0.484,
+        "t_learner": 0.643,
+        "s_learner": 0.635,
+        "x_learner": 1.0
+      }
+    }
+  },
+  "uplift": {
+    "outcome": "visit",
+    "data_tag": "full",
+    "n_rows": 13979592,
+    "split_sizes": {
+      "train": 8387756,
+      "val": 1397958,
+      "test": 4193878
+    },
+    "split": {
+      "fractions": {
+        "train": 0.6,
+        "val": 0.1,
+        "test": 0.3
+      },
+      "stratified_by": [
+        "treatment",
+        "visit",
+        "conversion"
+      ],
+      "seed": 42
+    },
+    "lightgbm_fixed": {
+      "learning_rate": 0.1,
+      "n_estimators": 1000,
+      "subsample": 0.8,
+      "subsample_freq": 1,
+      "colsample_bytree": 0.9,
+      "reg_lambda": 1.0,
+      "verbose": -1,
+      "n_jobs": -1
+    },
+    "tuning": {
+      "chosen": {
+        "num_leaves": 31,
+        "min_child_samples": 2000
+      },
+      "grid": [
+        {
+          "num_leaves": 31,
+          "min_child_samples": 200,
+          "val_logloss": 0.10360412524661419,
+          "best_iteration": 165,
+          "seconds": 19.0
+        },
+        {
+          "num_leaves": 127,
+          "min_child_samples": 200,
+          "val_logloss": 0.10362629980980274,
+          "best_iteration": 58,
+          "seconds": 15.5
+        },
+        {
+          "num_leaves": 31,
+          "min_child_samples": 2000,
+          "val_logloss": 0.10357635497897377,
+          "best_iteration": 150,
+          "seconds": 19.5
+        },
+        {
+          "num_leaves": 127,
+          "min_child_samples": 2000,
+          "val_logloss": 0.1035932051424756,
+          "best_iteration": 62,
+          "seconds": 20.1
+        }
+      ],
+      "tuned_on_rows": 2000000
+    },
+    "seeds": [
+      42
+    ],
+    "test_rank_correlation_first_seed": {
+      "response": {
+        "response": 1.0,
+        "t_learner": 0.565,
+        "s_learner": 0.855,
+        "x_learner": 0.832
+      },
+      "t_learner": {
+        "response": 0.565,
+        "t_learner": 1.0,
+        "s_learner": 0.685,
+        "x_learner": 0.569
+      },
+      "s_learner": {
+        "response": 0.855,
+        "t_learner": 0.685,
+        "s_learner": 1.0,
+        "x_learner": 0.845
+      },
+      "x_learner": {
+        "response": 0.832,
+        "t_learner": 0.569,
+        "s_learner": 0.845,
+        "x_learner": 1.0
+      }
+    },
+    "test_seed_stability_spearman": null,
+    "test_mean_predicted_uplift": {
+      "t_learner": 0.007372564170509577,
+      "s_learner": 0.007286952342838049,
+      "x_learner": 0.0072342404164373875
+    },
+    "per_seed": {
+      "42": {
+        "best_iterations": {
+          "response": {
+            "m_best_iteration": 504
+          },
+          "t_learner": {
+            "mu1_best_iteration": 498,
+            "mu0_best_iteration": 83
+          },
+          "s_learner": {
+            "m_best_iteration": 499
+          },
+          "x_learner": {
+            "tau1_best_iteration": 285,
+            "tau0_best_iteration": 28
+          },
+          "propensity": {
+            "m_best_iteration": 46
+          }
+        },
+        "fit_seconds": {
+          "propensity": 50.6,
+          "response": 261.4,
+          "t_learner": 236.9,
+          "s_learner": 258.9,
+          "x_learner": 107.4
+        },
+        "val_qini_auc": {
+          "response": 0.08567780125629086,
+          "t_learner": 0.07930829264400359,
+          "s_learner": 0.08929472338143964,
+          "x_learner": 0.09222619625660428
+        },
+        "val_mean_score": {
+          "response": 0.04698707736133807,
+          "t_learner": 0.0073859482013165145,
+          "s_learner": 0.007307916848582148,
+          "x_learner": 0.0072530693645133145
+        },
+        "val_propensity_auc": 0.5113096019120459
+      }
+    },
+    "scores_file": "results\\scores\\test_scores_full.parquet"
   }
 }

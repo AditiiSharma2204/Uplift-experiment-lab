@@ -128,3 +128,58 @@ Consequences:
 **D-17. Oddity noted, not yet explained.** In conversion's lowest score bin the observed conversion rate (0.33%) is far above bins
 2 to 10 (<0.02%). A cluster of rows seems to be mis-scored by the 2-fold model. It does not affect the visit results. We will check
 whether the S3 models show the same thing.
+
+## Stage S3: uplift models
+
+**D-18. Headline ATE = ML-score Lin estimate.** `ate.visit_abs` = +0.665 pp [0.640, 0.690] (+17.4% relative). The unadjusted
++1.034 pp is kept as `ate.visit_abs_naive`, labelled as biased by the pooling (D-16). Reason: the two flexible adjustments
+(ML-score Lin 0.665, post-stratified 0.691) agree, while the unadjusted number fails the "adjustment should not move it" check.
+
+**D-19. Modelling outcome = visit.** Conversion has 40.8k events in total, about 12k of them in the test set and only about 1.2k in the test
+control arm. Uplift rankings on that would be mostly noise (see the conversion MDE in D-13).
+
+**D-20. Split.** 60/10/30 train/validation/test, stratified by treatment x visit x conversion, seed 42, cached in
+`data/processed/split_full.parquet` so it never changes between runs. The test set is large on purpose (4.2M rows, about 197k
+visits) because Qini on a rare outcome is noisy. The test outcomes are not read in S3. Only test *features* are scored and
+written to `results/scores/`.
+
+**D-21. Light tuning, one shared setting.** Grid over num_leaves {31, 127} x min_child_samples {200, 2000}, learning rate 0.1,
+early stopping (50 rounds) on the validation log-loss of a response model trained on a 2M-row subsample of train. The best
+setting is used for *every* base learner, so the learners differ only in their logic, not in how hard each was tuned.
+Log: `data/processed/tuning_full.json` and `results.json -> uplift.tuning`. Each model's number of trees is chosen by early
+stopping on the validation split (the right arm's rows for arm-specific models).
+
+**D-22. Propensity model e(x) = P(t=1 | x).** In a clean randomized experiment e(x) would equal 0.85 for everyone. Because of the
+pooling (D-16) it varies slightly, so we fit it (same LightGBM setting) on train and:
+(a) use it as the blending weight in the X-learner, and (b) save it for the test set so S4 can weight by inverse propensity.
+
+**D-23. Seeds.** The split is fixed (seed 42). "Seeds" change only the LightGBM randomness (row/column subsampling). The full data
+was run with seed 42 first (about 16 min per seed on this laptop). Seeds 43 and 44 can be added with
+`python run_all.py --stage s3 --seeds 43 44`. The runner appends them without refitting seed 42.
+
+### The four learners in plain English
+
+| learner | what it does | what it assumes | where it goes wrong |
+|---|---|---|---|
+| **Response model** | Predicts P(visit \| x) for everyone, ignoring treatment. Target the highest scores. | That people likely to visit are the people the ad *changes*. | Ranks "sure things" (would visit anyway) at the top. We pay to treat people whose behaviour we don't change. It answers "who will visit?", not "who will visit *because of* the ad?". |
+| **T-learner** | Two models: one on treated users, one on control. Uplift = difference of their predictions. | Each arm's model is accurate enough that the *difference* is meaningful. | The control arm is small (15%), so its model is noisier. The difference of two noisy predictions amplifies noise, and the models may pick up unrelated patterns in each arm that show up as fake uplift. |
+| **S-learner** | One model with treatment as an extra input. Uplift = prediction with t=1 minus t=0. | The model will learn how treatment interacts with the features. | Trees can largely ignore the treatment flag when it is a weak predictor next to strong features (regularisation bias). Uplift is then shrunk toward zero and heterogeneity is lost. |
+| **X-learner** | Starts from the T-learner. Imputes each user's individual effect using the *other* arm's model (treated: y - mu0(x); control: mu1(x) - y), fits models to those imputed effects, and blends them with the propensity. | The first-stage models are good. Effects are smoother than outcomes, so they are easier to learn. | Errors in mu0/mu1 carry straight into the imputed effects, and it has more moving parts to validate. It is built for unbalanced designs like ours: most weight goes to the effect model built from control users, whose imputations use the model fitted on the large treated arm. |
+
+### S3 results (full data, seed 42; seeds 43/44 appended later)
+
+- Split: 8,387,756 train / 1,397,958 validation / 4,193,878 test.
+- Tuning barely matters: all four grid settings are within 0.00005 validation log-loss (0.10358 to 0.10363). Chosen:
+  num_leaves 31, min_child_samples 2000.
+- Early stopping shows how much signal each model found: mu1 (treated) used 498 trees, **mu0 (control) only 83**, and the X-learner's
+  tau0 only 28. The control arm has 6x fewer rows, so its model is coarser. That is the main weakness of the T-learner here.
+- Propensity model validation AUC = 0.511, consistent with D-08: assignment is almost, but not quite, random.
+- **Sanity check (no test outcomes used):** the mean predicted uplift on test is 0.72 to 0.74 pp for all three uplift learners. That is
+  close to the *adjusted* ATE (0.665 to 0.691 pp) and far from the naive 1.034 pp. Because the learners condition on x, they are
+  largely free of the pooling bias, as expected (D-16).
+- Rank agreement on test (Spearman, seed 42): response vs S-learner 0.86, vs X-learner 0.83, vs T-learner 0.57. **On this
+  data the uplift rankings largely track the baseline visit propensity.** The absolute effect grows with the baseline rate
+  (D-16 strata: +0.01 pp in the lowest bin, +5.7 pp in the top). So a response model is a much stronger baseline here than
+  the textbook "sure things" story suggests. S4 decides whether the uplift models beat it by more than noise.
+- Validation Qini AUC (for information only; not used for selection, and not propensity-corrected): X 0.092, S 0.089,
+  response 0.086, T 0.079.
