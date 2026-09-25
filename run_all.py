@@ -100,11 +100,39 @@ def stage_s3(dev: bool, seeds: list[int]) -> None:
     print("seed stability:", res["test_seed_stability_spearman"])
 
 
+def stage_s4(dev: bool) -> None:
+    import json
+
+    from src import evaluate
+    from src.common import CURVES_JSON
+
+    ev, curves = evaluate.run("dev" if dev else "full")
+    update_results("evaluation_dev" if dev else "evaluation", ev)
+    if not dev:
+        m = ev["primary"]["models"][ev["best_model"]]
+        update_results("uplift", {"best_model": ev["best_model"], "auuc": m["auuc"], "auuc_ci": m["auuc_ci"],
+                                  "auuc_per_1m": m["auuc_per_1m"], "auuc_per_1m_ci": m["auuc_per_1m_ci"]})
+        data = json.loads(CURVES_JSON.read_text()) if CURVES_JSON.exists() else {}
+        data["qini"] = curves
+        CURVES_JSON.write_text(json.dumps(data))
+    p = ev["primary"]
+    print(f"test ATE (IPW): {p['ate_test']:.5f} {p['ate_test_ci']}")
+    for m, r in p["models"].items():
+        print(f"{m:10s} AUUC/1M {r['auuc_per_1m']:8.1f} [{r['auuc_per_1m_ci'][0]:8.1f}, {r['auuc_per_1m_ci'][1]:8.1f}]"
+              f"  unweighted {ev['unweighted'][m]['auuc'] * 1e6:8.1f}  conv {ev['conversion'][m]['auuc'] * 1e6:7.1f}"
+              f"  up@10 {r['uplift_at_k']['10']['uplift']:.4f}")
+    for k, v in p["pairwise_auuc"].items():
+        print(f"  {k:26s} diff/1M {v['diff'] * 1e6:8.1f}  bonf [{v['ci_bonferroni'][0] * 1e6:8.1f}, "
+              f"{v['ci_bonferroni'][1] * 1e6:8.1f}]  {'DIFFERENT' if v['distinguishable_bonferroni'] else 'within noise'}")
+    print("top10 profile:", json.dumps(ev["top10_profile"], indent=0))
+    print("per-seed AUUC:", ev["per_seed_auuc"])
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--stage", default="all", choices=["s01", "s2", "s3", "all"])
+    ap.add_argument("--stage", default="all", choices=["s01", "s2", "s3", "s4", "all"])
     ap.add_argument("--dev-n", type=int, default=1_000_000)
-    ap.add_argument("--dev", action="store_true", help="stage s3: run on the 1M dev sample")
+    ap.add_argument("--dev", action="store_true", help="stages s3/s4: run on the 1M dev sample")
     ap.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44],
                     help="stage s3: model seeds; seeds already in the scores file are skipped")
     args = ap.parse_args()
@@ -114,6 +142,8 @@ def main() -> None:
         stage_s2()
     if args.stage in ("s3", "all"):
         stage_s3(args.dev, args.seeds)
+    if args.stage in ("s4", "all"):
+        stage_s4(args.dev)
 
 
 if __name__ == "__main__":
