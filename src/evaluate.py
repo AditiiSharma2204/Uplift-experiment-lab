@@ -38,7 +38,9 @@ LABELS = {"response": "Response model", "t_learner": "T-learner", "s_learner": "
           "x_learner": "X-learner", "random": "Random score"}
 COLORS = {"response": SERIES[1], "t_learner": SERIES[2], "s_learner": SERIES[3], "x_learner": SERIES[0],
           "random": NEUTRAL}
-BOOT_PATH = RESULTS_DIR / "scores" / "eval_bootstrap.npz"
+def boot_path(tag: str = "full"):
+    """Bootstrap replicates, one file per dataset so a dev run never overwrites full-data results."""
+    return RESULTS_DIR / "scores" / f"eval_bootstrap_{tag}.npz"
 
 
 # ----------------------------------------------------------------------------- data
@@ -274,11 +276,12 @@ def run(tag: str = "full") -> tuple[dict, dict]:
     res = evaluate(test, seeds, weighted=True, keep_replicates=True)
     res_unw = evaluate(test, seeds, weighted=False)
     res_conv = evaluate(test, seeds, outcome="conversion", weighted=True)
-    plot_curves(res)
-    plot_auuc(res, res_unw)
+    suffix = "" if tag == "full" else f"_{tag}"
+    plot_curves(res, FIGURES_DIR / f"qini_curves{suffix}.png")
+    plot_auuc(res, res_unw, FIGURES_DIR / f"auuc_forest{suffix}.png")
     reps = res.pop("_replicates")
-    BOOT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    np.savez_compressed(BOOT_PATH, grid=GRID, **{f"gain_{m}": reps["gain"][m] for m in MODELS},
+    boot_path(tag).parent.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(boot_path(tag), grid=GRID, **{f"gain_{m}": reps["gain"][m] for m in MODELS},
                         **{f"point_{m}": reps["point"][m][1] for m in MODELS})
     res["_replicates"] = reps
     curves = curves_payload(res)

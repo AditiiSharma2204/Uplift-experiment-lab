@@ -246,3 +246,75 @@ lowest. We did not train conversion-specific models (D-19).
 
 **D-33. Seed averaging helps a little.** Single-seed AUUC for the S-learner ranges from 3,249 to 3,390 per 1M; the 3-seed average scores 3,350.
 The T-learner varies most across seeds, consistent with its noisy control-arm model.
+
+## Stage S5: targeting policy and economics
+
+**D-34. Policy = treat the top k by X-learner uplift score** (the model selected on validation in D-29). All quantities are on the
+test set, propensity-weighted, per 1,000,000 users, with 95% intervals from the same 200 paired bootstrap replicates as S4
+(`results/scores/eval_bootstrap_full.npz`). *Bug caught here:* the replicate file used to be shared between dev and full runs,
+and a dev check had overwritten it. The first S5 draft therefore showed dev numbers (the treat-everyone point was 8,212 instead of the
+test ATE of 7,594). The file is now per dataset (`eval_bootstrap_{tag}.npz`) and S4 was rerun. The rerun reproduced S4 exactly.
+
+**D-35. Cost and value are ILLUSTRATIVE assumptions** and are labelled as such in results, figures and the app. Range: value
+per visit $0.10 to $2.00, cost-to-value ratio c/v from 0 to 0.2. Default scenario: v = $1.00, c = $0.005 (c/v = 0.005). The optimal k depends
+only on c/v because profit/v = incremental(k) - 1e6 x k x (c/v). So the sensitivity analysis is a sweep over c/v (241 values,
+0 to 0.3).
+
+**D-36. Incremental visits by share treated (vs treating nobody):**
+
+| treat top | incremental visits per 1M | 95% CI | vs random targeting | share of all incremental visits |
+|---|---|---|---|---|
+| 5% | 4,798 | [4,509, 5,088] | +4,418 | 63% |
+| 10% | 6,160 | [5,791, 6,583] | +5,400 | 81% |
+| 20% | 6,972 | [6,531, 7,455] | +5,453 | 92% |
+| **30%** | **7,212** | **[6,732, 7,760]** | +4,934 | **95%** |
+| 50% | 7,591 | [7,019, 8,153] | +3,794 | 100% |
+| 100% | 7,594 | [7,042, 8,170] | 0 | 100% |
+
+Treating 30% of users gets 95% of the campaign's incremental visits. The other half of the population contributes nothing
+measurable.
+
+**D-37. Sensitivity: profit-maximizing k across cost/value ratios** (profit per 1M users in units of v):
+
+| c/v | optimal k | 95% CI | regime | profit at optimum | treat everyone |
+|---|---|---|---|---|---|
+| 0 | 99.5% | [42.5, 100] | treat (almost) all | 7,661 | 7,594 |
+| 0.0005 | 45.0% | [40.5, 57.0] | target | 7,380 | 7,094 |
+| 0.001 | 42.0% | [39.0, 45.5] | target | 7,158 | 6,594 |
+| 0.002 | 40.5% | [22.5, 42.5] | target | 6,740 | 5,594 |
+| **0.005** | **19.5%** | **[14.0, 26.5]** | target | **6,001 [5,554, 6,484]** | 2,594 |
+| 0.0075 | 18.5% | [10.0, 20.5] | target | 5,554 | 94 |
+| 0.01 | 14.0% | [8.5, 18.5] | target | 5,190 | -2,406 |
+| 0.02 | 8.0% | [7.0, 10.0] | target | 4,253 | -12,406 |
+| 0.05 | 3.5% | [3.5, 5.0] | target | 2,424 | -42,406 |
+| 0.1 | 1.5% | [1.5, 2.0] | target | 968 | -92,406 |
+| 0.2 | 0.5% | [0.0, 0.5] | ~treat none (profit CI [-78, +188] includes 0) | 57 | -192,406 |
+
+Regimes and break-even ratios (with bootstrap CIs):
+- **Treat everyone** is only optimal when treatment is essentially free: the threshold is c/v < ~0, CI [-0.040, +0.0002]. The bottom half of the
+  population adds no visits, so any positive cost makes excluding them worthwhile. k >= 95% is labelled "treat (almost) all"
+  because the flat tail makes the exact argmax wander between 90% and 100%.
+- **A blanket campaign (treat everyone) breaks even at c/v = 0.0076 [0.0070, 0.0082]**, which is the overall uplift per user.
+  Above that, treating everyone loses money.
+- **Targeting stays profitable up to c/v = 0.215 [0.188, 0.241]**, the best average uplift of any top slice (the top 0.5%).
+  Beyond it, **treat nobody**. So targeting widens the profitable cost range by about 28x.
+- Default scenario (c = $0.005, v = $1): treat the top **19.5% [14.0%, 26.5%]**, profit **$6,001 [5,554, 6,484] per 1M users**, vs
+  $2,594 for treating everyone. That is 2.3x the profit with a fifth of the treatments.
+
+**D-38. Does the ranking model matter for money?** Profit at each model's own optimal k (per 1M, units of v):
+
+| c/v | X-learner | S-learner | T-learner | Response model |
+|---|---|---|---|---|
+| 0.001 | 7,162 | 7,154 | 6,855 | 7,060 |
+| 0.005 | 5,998 | 6,178 | 5,871 | 5,925 |
+| 0.02 | **4,238** [3,872, 4,621] | 4,154 | 3,933 | **3,291** [2,853, 3,803] |
+| 0.05 | **2,390** [2,146, 2,649] | 2,352 | 2,070 | **610** [324, 893] |
+
+When treatment is cheap, every ranking is similar, because you treat nearly everyone who responds. **When treatment is expensive and only the top few %
+can be treated, ranking by response loses most of the profit** (c/v = 0.05: 610 vs 2,390, about 4x less, and the CIs do not overlap). That is the business
+version of D-30: the response model's top slice is full of people who would have visited anyway.
+
+**D-39. Caveat: the chosen k is optimistic (winner's curse).** k is picked on the test curve and its profit is read off that same curve,
+so the profit at the optimum is biased slightly upward. The optimal-k interval (argmax recomputed on each bootstrap replicate)
+shows how unstable the choice is. In production, pick k on one sample and confirm it on a fresh holdout, or run the policy as an
+A/B test against treat-all.

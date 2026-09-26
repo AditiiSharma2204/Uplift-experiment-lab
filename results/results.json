@@ -3088,5 +3088,474 @@
       "x_learner": 0.09141464965406565
     },
     "best_on_test_auuc": "s_learner"
+  },
+  "policy": {
+    "model": "x_learner",
+    "assumptions": {
+      "label": "ILLUSTRATIVE cost/value assumptions - not Criteo figures",
+      "value_per_visit_range_usd": [
+        0.1,
+        2.0
+      ],
+      "cost_to_value_ratio_range": [
+        0.0,
+        0.2
+      ],
+      "default_value_per_visit_usd": 1.0,
+      "default_cost_per_treatment_usd": 0.005
+    },
+    "units": "per 1,000,000 users; profit in units of v unless *_usd",
+    "incremental_by_k": {
+      "5": {
+        "treated_per_1m": 50000.0,
+        "incremental_per_1m": 4798.004968772822,
+        "incremental_per_1m_ci": [
+          4508.908833296815,
+          5087.526151630849
+        ],
+        "vs_random_per_1m": 4418.288185700011,
+        "vs_random_per_1m_ci": [
+          4140.0005990491845,
+          4687.37372398488
+        ],
+        "share_of_all_incremental": 0.6317873192153319,
+        "incremental_per_treated": 0.09596009937545644
+      },
+      "10": {
+        "treated_per_1m": 100000.0,
+        "incremental_per_1m": 6159.652589504113,
+        "incremental_per_1m_ci": [
+          5790.826529007716,
+          6582.973688258089
+        ],
+        "vs_random_per_1m": 5400.21902335849,
+        "vs_random_per_1m_ci": [
+          5058.805312890439,
+          5787.604595261461
+        ],
+        "share_of_all_incremental": 0.8110851118638851,
+        "incremental_per_treated": 0.061596525895041124
+      },
+      "20": {
+        "treated_per_1m": 200000.0,
+        "incremental_per_1m": 6972.349008616025,
+        "incremental_per_1m_ci": [
+          6530.572874226229,
+          7454.927026988349
+        ],
+        "vs_random_per_1m": 5453.4818763247795,
+        "vs_random_per_1m_ci": [
+          5107.090491493436,
+          5851.613011371926
+        ],
+        "share_of_all_incremental": 0.9180986092046224,
+        "incremental_per_treated": 0.03486174504308012
+      },
+      "30": {
+        "treated_per_1m": 300000.0,
+        "incremental_per_1m": 7212.284869342994,
+        "incremental_per_1m_ci": [
+          6731.819163393464,
+          7760.0782454511855
+        ],
+        "vs_random_per_1m": 4933.9841709061275,
+        "vs_random_per_1m_ci": [
+          4598.403940876724,
+          5326.293491400789
+        ],
+        "share_of_all_incremental": 0.9496926644877887,
+        "incremental_per_treated": 0.02404094956447665
+      },
+      "50": {
+        "treated_per_1m": 500000.0,
+        "incremental_per_1m": 7590.915036081149,
+        "incremental_per_1m_ci": [
+          7019.395483352568,
+          8152.557129380592
+        ],
+        "vs_random_per_1m": 3793.747205353037,
+        "vs_random_per_1m_ci": [
+          3492.398330755157,
+          4093.4817617313684
+        ],
+        "share_of_all_incremental": 0.9995495820138112,
+        "incremental_per_treated": 0.015181830072162297
+      },
+      "100": {
+        "treated_per_1m": 1000000.0,
+        "incremental_per_1m": 7594.3356614562235,
+        "incremental_per_1m_ci": [
+          7041.891140382188,
+          8170.380408049368
+        ],
+        "vs_random_per_1m": 0.0,
+        "vs_random_per_1m_ci": [
+          0.0,
+          0.0
+        ],
+        "share_of_all_incremental": 1.0,
+        "incremental_per_treated": 0.007594335661456224
+      }
+    },
+    "incremental_per_1m_at_30pct": 7212.284869342994,
+    "incremental_per_1m_at_30pct_ci": [
+      6731.819163393464,
+      7760.0782454511855
+    ],
+    "sensitivity_table": [
+      {
+        "cost_to_value": 0.0,
+        "optimal_k": 0.995,
+        "optimal_k_ci": [
+          0.425,
+          1.0
+        ],
+        "regime": "treat (almost) all",
+        "profit_per_1m_at_optimum_in_v": 7660.763660024247,
+        "profit_per_1m_at_optimum_in_v_ci": [
+          7075.652493146224,
+          8311.676144158859
+        ],
+        "profit_per_1m_treat_all_in_v": 7594.3356614562235,
+        "profit_per_1m_treat_none_in_v": 0.0
+      },
+      {
+        "cost_to_value": 0.0005,
+        "optimal_k": 0.45,
+        "optimal_k_ci": [
+          0.405,
+          0.570125
+        ],
+        "regime": "target top k",
+        "profit_per_1m_at_optimum_in_v": 7380.127377702297,
+        "profit_per_1m_at_optimum_in_v_ci": [
+          6875.810247744293,
+          7929.662903409351
+        ],
+        "profit_per_1m_treat_all_in_v": 7094.3356614562235,
+        "profit_per_1m_treat_none_in_v": 0.0
+      },
+      {
+        "cost_to_value": 0.001,
+        "optimal_k": 0.42,
+        "optimal_k_ci": [
+          0.39,
+          0.455
+        ],
+        "regime": "target top k",
+        "profit_per_1m_at_optimum_in_v": 7158.014079762223,
+        "profit_per_1m_at_optimum_in_v_ci": [
+          6661.3455709829295,
+          7715.038668944496
+        ],
+        "profit_per_1m_treat_all_in_v": 6594.3356614562235,
+        "profit_per_1m_treat_none_in_v": 0.0
+      },
+      {
+        "cost_to_value": 0.002,
+        "optimal_k": 0.405,
+        "optimal_k_ci": [
+          0.225,
+          0.42512500000000003
+        ],
+        "regime": "target top k",
+        "profit_per_1m_at_optimum_in_v": 6739.615006482401,
+        "profit_per_1m_at_optimum_in_v_ci": [
+          6222.087624188088,
+          7301.5034033071515
+        ],
+        "profit_per_1m_treat_all_in_v": 5594.3356614562235,
+        "profit_per_1m_treat_none_in_v": 0.0
+      },
+      {
+        "cost_to_value": 0.005,
+        "optimal_k": 0.195,
+        "optimal_k_ci": [
+          0.14,
+          0.265
+        ],
+        "regime": "target top k",
+        "profit_per_1m_at_optimum_in_v": 6001.449144935547,
+        "profit_per_1m_at_optimum_in_v_ci": [
+          5553.955072289568,
+          6483.752431168532
+        ],
+        "profit_per_1m_treat_all_in_v": 2594.3356614562235,
+        "profit_per_1m_treat_none_in_v": 0.0
+      },
+      {
+        "cost_to_value": 0.0075,
+        "optimal_k": 0.185,
+        "optimal_k_ci": [
+          0.1,
+          0.205
+        ],
+        "regime": "target top k",
+        "profit_per_1m_at_optimum_in_v": 5554.173797606147,
+        "profit_per_1m_at_optimum_in_v_ci": [
+          5118.313839120907,
+          6015.943020365504
+        ],
+        "profit_per_1m_treat_all_in_v": 94.33566145622407,
+        "profit_per_1m_treat_none_in_v": 0.0
+      },
+      {
+        "cost_to_value": 0.01,
+        "optimal_k": 0.14,
+        "optimal_k_ci": [
+          0.085,
+          0.185
+        ],
+        "regime": "target top k",
+        "profit_per_1m_at_optimum_in_v": 5189.740571237743,
+        "profit_per_1m_at_optimum_in_v_ci": [
+          4791.337781810218,
+          5599.08390563459
+        ],
+        "profit_per_1m_treat_all_in_v": -2405.6643385437765,
+        "profit_per_1m_treat_none_in_v": 0.0
+      },
+      {
+        "cost_to_value": 0.02,
+        "optimal_k": 0.08,
+        "optimal_k_ci": [
+          0.07,
+          0.1
+        ],
+        "regime": "target top k",
+        "profit_per_1m_at_optimum_in_v": 4252.71318676569,
+        "profit_per_1m_at_optimum_in_v_ci": [
+          3887.4178635230974,
+          4635.4383380884365
+        ],
+        "profit_per_1m_treat_all_in_v": -12405.664338543776,
+        "profit_per_1m_treat_none_in_v": 0.0
+      },
+      {
+        "cost_to_value": 0.05,
+        "optimal_k": 0.035,
+        "optimal_k_ci": [
+          0.035,
+          0.05
+        ],
+        "regime": "target top k",
+        "profit_per_1m_at_optimum_in_v": 2424.1557405892668,
+        "profit_per_1m_at_optimum_in_v_ci": [
+          2180.358923000346,
+          2683.126417420629
+        ],
+        "profit_per_1m_treat_all_in_v": -42405.66433854378,
+        "profit_per_1m_treat_none_in_v": 0.0
+      },
+      {
+        "cost_to_value": 0.1,
+        "optimal_k": 0.015,
+        "optimal_k_ci": [
+          0.015,
+          0.02
+        ],
+        "regime": "target top k",
+        "profit_per_1m_at_optimum_in_v": 967.9210056025966,
+        "profit_per_1m_at_optimum_in_v_ci": [
+          796.5493580519021,
+          1177.492797352722
+        ],
+        "profit_per_1m_treat_all_in_v": -92405.66433854378,
+        "profit_per_1m_treat_none_in_v": 0.0
+      },
+      {
+        "cost_to_value": 0.2,
+        "optimal_k": 0.005,
+        "optimal_k_ci": [
+          0.0,
+          0.005
+        ],
+        "regime": "target top k",
+        "profit_per_1m_at_optimum_in_v": 57.476806208485485,
+        "profit_per_1m_at_optimum_in_v_ci": [
+          -77.81909784057049,
+          188.15364598894175
+        ],
+        "profit_per_1m_treat_all_in_v": -192405.66433854378,
+        "profit_per_1m_treat_none_in_v": 0.0
+      }
+    ],
+    "breakeven": {
+      "blanket_campaign_breakeven_c_over_v": 0.007594335661456224,
+      "blanket_campaign_breakeven_ci": [
+        0.007041891140382187,
+        0.008170380408049368
+      ],
+      "treat_all_optimal_below_c_over_v": -0.013285599713604665,
+      "treat_all_optimal_below_ci": [
+        -0.03976529185650995,
+        0.00020368360430955703
+      ],
+      "treat_none_optimal_above_c_over_v": 0.21497770461932278,
+      "treat_none_optimal_above_ci": [
+        0.1879185238095116,
+        0.24111307257541403
+      ],
+      "note": "blanket = treat everyone; profitable only while c/v < overall uplift per user"
+    },
+    "default_scenario": {
+      "cost_per_treatment_usd": 0.005,
+      "value_per_visit_usd": 1.0,
+      "cost_to_value": 0.005,
+      "optimal_k": 0.195,
+      "optimal_k_ci": [
+        0.14,
+        0.265
+      ],
+      "profit_per_1m_usd": 6001.449144935547,
+      "profit_per_1m_usd_ci": [
+        5553.955072289568,
+        6483.752431168532
+      ],
+      "profit_treat_all_per_1m_usd": 2594.3356614562235
+    },
+    "optimal_k": 0.195,
+    "optimal_k_ci": [
+      0.14,
+      0.265
+    ],
+    "model_comparison_profit": {
+      "x_learner": {
+        "0.001": {
+          "optimal_k": 0.42,
+          "profit_per_1m_in_v": 7162.292415193942,
+          "profit_ci": [
+            6665.623906414648,
+            7719.317004376215
+          ]
+        },
+        "0.005": {
+          "optimal_k": 0.195,
+          "profit_per_1m_in_v": 5998.182251319775,
+          "profit_ci": [
+            5550.688178673796,
+            6480.4855375527595
+          ]
+        },
+        "0.02": {
+          "optimal_k": 0.08,
+          "profit_per_1m_in_v": 4237.787295411102,
+          "profit_ci": [
+            3872.491972168509,
+            4620.512446733848
+          ]
+        },
+        "0.05": {
+          "optimal_k": 0.035,
+          "profit_per_1m_in_v": 2389.7510597363193,
+          "profit_ci": [
+            2145.9542421473984,
+            2648.7217365676815
+          ]
+        }
+      },
+      "response": {
+        "0.001": {
+          "optimal_k": 0.36,
+          "profit_per_1m_in_v": 7059.968385356488,
+          "profit_ci": [
+            6611.482216314662,
+            7631.026793195668
+          ]
+        },
+        "0.005": {
+          "optimal_k": 0.225,
+          "profit_per_1m_in_v": 5924.846707514613,
+          "profit_ci": [
+            5503.103471401277,
+            6462.43606614285
+          ]
+        },
+        "0.02": {
+          "optimal_k": 0.155,
+          "profit_per_1m_in_v": 3291.029228682296,
+          "profit_ci": [
+            2853.39437940714,
+            3802.5660918349545
+          ]
+        },
+        "0.05": {
+          "optimal_k": 0.045,
+          "profit_per_1m_in_v": 609.7232246618897,
+          "profit_ci": [
+            323.74043208544373,
+            892.5155429036491
+          ]
+        }
+      },
+      "t_learner": {
+        "0.001": {
+          "optimal_k": 0.32,
+          "profit_per_1m_in_v": 6854.675536380069,
+          "profit_ci": [
+            6376.081868306834,
+            7355.022018309852
+          ]
+        },
+        "0.005": {
+          "optimal_k": 0.2,
+          "profit_per_1m_in_v": 5871.43354462585,
+          "profit_ci": [
+            5460.036830228612,
+            6352.4836103723555
+          ]
+        },
+        "0.02": {
+          "optimal_k": 0.08,
+          "profit_per_1m_in_v": 3933.2286159423984,
+          "profit_ci": [
+            3595.612890011656,
+            4306.55310310573
+          ]
+        },
+        "0.05": {
+          "optimal_k": 0.035,
+          "profit_per_1m_in_v": 2070.2759606736204,
+          "profit_ci": [
+            1830.1082781671473,
+            2316.218379813899
+          ]
+        }
+      },
+      "s_learner": {
+        "0.001": {
+          "optimal_k": 0.35,
+          "profit_per_1m_in_v": 7153.67102538011,
+          "profit_ci": [
+            6711.605223922907,
+            7697.5085826394
+          ]
+        },
+        "0.005": {
+          "optimal_k": 0.175,
+          "profit_per_1m_in_v": 6178.1094137021655,
+          "profit_ci": [
+            5789.3707877566585,
+            6644.787917068644
+          ]
+        },
+        "0.02": {
+          "optimal_k": 0.095,
+          "profit_per_1m_in_v": 4153.91439697861,
+          "profit_ci": [
+            3800.640423342127,
+            4524.292964466668
+          ]
+        },
+        "0.05": {
+          "optimal_k": 0.04,
+          "profit_per_1m_in_v": 2352.1229232767805,
+          "profit_ci": [
+            2102.4511524277796,
+            2639.336610227195
+          ]
+        }
+      }
+    }
   }
 }

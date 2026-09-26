@@ -128,9 +128,36 @@ def stage_s4(dev: bool) -> None:
     print("per-seed AUUC:", ev["per_seed_auuc"])
 
 
+def stage_s5() -> None:
+    import json
+
+    from src import policy
+    from src.common import CURVES_JSON
+
+    best = load_results()["evaluation"]["best_model"]
+    res, curves = policy.run(best)
+    update_results("policy", res)
+    data = json.loads(CURVES_JSON.read_text()) if CURVES_JSON.exists() else {}
+    data["policy"] = curves
+    ev = load_results()["evaluation"]["primary"]
+    data["meta"] = {"n_test": ev["n_test"], "n_boot": ev["n_boot"], "best_model": best,
+                    "outcome": "visit", "source": "Criteo Uplift Prediction Dataset v2.1 (CC BY-NC-SA 4.0)"}
+    CURVES_JSON.write_text(json.dumps(data))
+    for k, v in res["incremental_by_k"].items():
+        print(f"k={k:>3}%  incr/1M {v['incremental_per_1m']:7.0f} {[round(x) for x in v['incremental_per_1m_ci']]}"
+              f"  vs random {v['vs_random_per_1m']:7.0f}  share {v['share_of_all_incremental']:.2f}")
+    for r in res["sensitivity_table"]:
+        print(f"c/v={r['cost_to_value']:<7} k*={r['optimal_k']:.3f} {r['optimal_k_ci']}  {r['regime']:13s}"
+              f" profit {r['profit_per_1m_at_optimum_in_v']:8.0f} {[round(x) for x in r['profit_per_1m_at_optimum_in_v_ci']]}"
+              f"  treat-all {r['profit_per_1m_treat_all_in_v']:8.0f}")
+    print(json.dumps(res["breakeven"], indent=1))
+    print(json.dumps(res["default_scenario"], indent=1))
+    print(json.dumps(res["model_comparison_profit"], indent=1))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--stage", default="all", choices=["s01", "s2", "s3", "s4", "all"])
+    ap.add_argument("--stage", default="all", choices=["s01", "s2", "s3", "s4", "s5", "all"])
     ap.add_argument("--dev-n", type=int, default=1_000_000)
     ap.add_argument("--dev", action="store_true", help="stages s3/s4: run on the 1M dev sample")
     ap.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44],
@@ -144,6 +171,8 @@ def main() -> None:
         stage_s3(args.dev, args.seeds)
     if args.stage in ("s4", "all"):
         stage_s4(args.dev)
+    if args.stage in ("s5", "all"):
+        stage_s5()
 
 
 if __name__ == "__main__":
