@@ -10,3 +10,4 @@ __pycache__/
 *.log
 results/results_dev.json
 results/figures/*_dev.png
+docs/interview_prep.md
