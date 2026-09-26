@@ -8,3 +8,5 @@ __pycache__/
 .venv/
 .streamlit/secrets.toml
 *.log
+results/results_dev.json
+results/figures/*_dev.png

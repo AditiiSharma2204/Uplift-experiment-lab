@@ -13,6 +13,7 @@ PROCESSED_DIR = ROOT / "data" / "processed"
 RESULTS_DIR = ROOT / "results"
 FIGURES_DIR = RESULTS_DIR / "figures"
 RESULTS_JSON = RESULTS_DIR / "results.json"
+RESULTS_DEV_JSON = RESULTS_DIR / "results_dev.json"  # dev-sample runs; gitignored
 CURVES_JSON = RESULTS_DIR / "curves.json"
 
 FEATURES = [f"f{i}" for i in range(12)]

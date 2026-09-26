@@ -6,7 +6,7 @@ import time
 
 import psutil
 
-from src.common import load_results, update_results
+from src.common import RESULTS_DEV_JSON, RESULTS_JSON, load_results, update_results
 
 
 def stage_s01(dev_n: int) -> None:
@@ -89,9 +89,9 @@ def stage_s3(dev: bool, seeds: list[int]) -> None:
     from src import load, uplift_models
 
     df = load.load_dev() if dev else load.load_full()
-    tag, section = ("dev", "uplift_dev") if dev else ("full", "uplift")
-    res = uplift_models.run(df, tag, seeds=seeds, previous=load_results().get(section))
-    update_results(section, res)
+    tag, path = ("dev", RESULTS_DEV_JSON) if dev else ("full", RESULTS_JSON)
+    res = uplift_models.run(df, tag, seeds=seeds, previous=load_results(path).get("uplift"))
+    update_results("uplift", res, path)
     if not dev:
         update_results("data", {"n_rows_used": len(df)})
     for seed, r in res["per_seed"].items():
@@ -107,7 +107,7 @@ def stage_s4(dev: bool) -> None:
     from src.common import CURVES_JSON
 
     ev, curves = evaluate.run("dev" if dev else "full")
-    update_results("evaluation_dev" if dev else "evaluation", ev)
+    update_results("evaluation", ev, RESULTS_DEV_JSON if dev else RESULTS_JSON)
     if not dev:
         m = ev["primary"]["models"][ev["best_model"]]
         update_results("uplift", {"best_model": ev["best_model"], "auuc": m["auuc"], "auuc_ci": m["auuc_ci"],

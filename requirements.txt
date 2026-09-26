@@ -10,3 +10,4 @@ matplotlib>=3.8
 streamlit>=1.35
 psutil>=5.9
 tqdm>=4.66
+pytest>=8

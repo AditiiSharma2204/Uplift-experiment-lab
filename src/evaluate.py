@@ -269,9 +269,9 @@ def select_on_validation(uplift_section: dict) -> tuple[str, dict]:
 
 
 def run(tag: str = "full") -> tuple[dict, dict]:
-    from .common import load_results
+    from .common import RESULTS_DEV_JSON, RESULTS_JSON, load_results
 
-    section = load_results()["uplift" if tag == "full" else "uplift_dev"]
+    section = load_results(RESULTS_JSON if tag == "full" else RESULTS_DEV_JSON)["uplift"]
     test, seeds = load_test(tag)
     res = evaluate(test, seeds, weighted=True, keep_replicates=True)
     res_unw = evaluate(test, seeds, weighted=False)
