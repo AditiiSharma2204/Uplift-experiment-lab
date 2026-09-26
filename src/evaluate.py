@@ -26,7 +26,7 @@ import pandas as pd
 from scipy import stats
 
 from .common import FIGURES_DIR, OUTCOMES, PRIMARY_OUTCOME, RESULTS_DIR, SEED, TREATMENT
-from .plotting import NEUTRAL, SERIES, TEXT_SECONDARY, apply_style, plt
+from .plotting import NEUTRAL, SERIES, apply_style, plt
 from .uplift_models import LEARNERS, scores_path
 
 GRID = np.round(np.arange(0.005, 1.0 + 1e-9, 0.005), 3)  # targeting fractions 0.5% .. 100%
@@ -36,7 +36,7 @@ E_CLIP = (0.01, 0.99)
 MODELS = [*LEARNERS, "random"]
 LABELS = {"response": "Response model", "t_learner": "T-learner", "s_learner": "S-learner",
           "x_learner": "X-learner", "random": "Random score"}
-COLORS = {"response": SERIES[1], "t_learner": SERIES[2], "s_learner": SERIES[3], "x_learner": SERIES[0],
+COLORS = {"x_learner": SERIES[0], "response": SERIES[1], "s_learner": SERIES[2], "t_learner": SERIES[3],
           "random": NEUTRAL}
 def boot_path(tag: str = "full"):
     """Bootstrap replicates, one file per dataset so a dev run never overwrites full-data results."""
@@ -191,56 +191,68 @@ def per_seed_auuc(test: pd.DataFrame, seeds: list[int]) -> dict:
 
 
 # ----------------------------------------------------------------------------- figures
-def plot_curves(res: dict, path=None) -> None:
+def plot_curves(res: dict, path=None, path_all=None) -> None:
+    """Main figure: X-learner vs response model vs random. Second figure: all learners, no bands."""
     apply_style()
     path = path or FIGURES_DIR / "qini_curves.png"
+    path_all = path_all or FIGURES_DIR / "qini_all_models.png"
     reps = res["_replicates"]
-    k = np.r_[0, GRID] * 100
-    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.4))
-    for ax, relative in zip(axes, [False, True]):
-        for m in MODELS:
-            g = reps["point"][m][1] * 1e6
-            bg = reps["gain"][m] * 1e6
-            if relative:  # distance above the random line, per replicate
-                g = g - GRID * g[-1]
-                bg = bg - GRID[None, :] * bg[:, [-1]]
-            lo, hi = np.percentile(bg, [2.5, 97.5], axis=0)
-            style = dict(color=COLORS[m], lw=2 if m != "random" else 1.2, ls="-" if m != "random" else ":")
-            ax.plot(k, np.r_[0, g], label=LABELS[m], **style)
-            ax.fill_between(k, np.r_[0, lo], np.r_[0, hi], color=COLORS[m], alpha=0.15, lw=0)
-        if not relative:
-            ate = reps["point"]["random"][1][-1] * 1e6
-            ax.plot([0, 100], [0, ate], color=NEUTRAL, lw=1, ls="--")
-            ax.text(62, ate * 0.55, "random targeting", color=TEXT_SECONDARY, fontsize=8, rotation=0)
-            ax.set_ylabel("Incremental visits per 1M users")
-            ax.set_title("Qini (uplift) curves, 95% bootstrap bands")
-        else:
-            ax.axhline(0, color=NEUTRAL, lw=1, ls="--")
-            ax.set_ylabel("Incremental visits above random, per 1M")
-            ax.set_title("Same curves minus the random line")
-        ax.set_xlabel("Users targeted, ranked by model score (%)")
-        ax.set_xlim(0, 100)
-    axes[0].legend(fontsize=8, loc="lower right")
+    x = np.r_[0, GRID] * 100
+    ate = reps["point"]["random"][1][-1] * 1e6
+
+    fig, ax = plt.subplots(figsize=(7, 4.5))
+    for m in ["x_learner", "response"]:
+        g = np.r_[0, reps["point"][m][1] * 1e6]
+        lo, hi = np.percentile(reps["gain"][m] * 1e6, [2.5, 97.5], axis=0)
+        ax.plot(x, g, color=COLORS[m], label=LABELS[m])
+        ax.fill_between(x, np.r_[0, lo], np.r_[0, hi], color=COLORS[m], alpha=0.2, lw=0)
+    ax.plot([0, 100], [0, ate], "--", color=NEUTRAL, label="Random targeting")
+    j = k_index(0.05)
+    for m in ["x_learner", "response"]:
+        ax.plot(5, reps["point"][m][1][j] * 1e6, "o", color=COLORS[m], ms=5)
+    ux = res["models"]["x_learner"]["uplift_at_k"]["5"]["uplift"]
+    ur = res["models"]["response"]["uplift_at_k"]["5"]["uplift"]
+    ax.annotate(f"top 5%: uplift {100 * ux:.1f} pp (X-learner)\nvs {100 * ur:.1f} pp (response model)",
+                xy=(5, reps["point"]["response"][1][j] * 1e6), xytext=(22, 2500),
+                arrowprops=dict(arrowstyle="->", color="black", lw=0.8), fontsize=9)
+    ax.set_xlim(0, 100)
+    ax.set_ylim(bottom=0)
+    ax.set_xlabel("% of users targeted (ranked by model score)")
+    ax.set_ylabel("Incremental visits per 1M users")
+    ax.set_title(f"Qini curves, test set (n = {res['n_test']:,}), 95% bootstrap CI")
+    ax.legend(loc="lower right")
     fig.savefig(path)
+    plt.close(fig)
+
+    fig, ax = plt.subplots(figsize=(7, 4.5))
+    for m in ["x_learner", "s_learner", "t_learner", "response"]:
+        ax.plot(x, np.r_[0, reps["point"][m][1] * 1e6], color=COLORS[m], label=LABELS[m], lw=1.5)
+    ax.plot([0, 100], [0, ate], "--", color=NEUTRAL, label="Random targeting")
+    ax.set_xlim(0, 100)
+    ax.set_ylim(bottom=0)
+    ax.set_xlabel("% of users targeted (ranked by model score)")
+    ax.set_ylabel("Incremental visits per 1M users")
+    ax.set_title("Qini curves, all models (test set)")
+    ax.legend(loc="lower right")
+    fig.savefig(path_all)
     plt.close(fig)
 
 
 def plot_auuc(res: dict, res_unw: dict, path=None) -> None:
     apply_style()
     path = path or FIGURES_DIR / "auuc_forest.png"
-    fig, ax = plt.subplots(figsize=(6.8, 3.4))
+    fig, ax = plt.subplots(figsize=(6.5, 3.5))
     ms = MODELS[::-1]
     for i, m in enumerate(ms):
-        for dy, r, filled in [(0.12, res, True), (-0.12, res_unw, False)]:
+        for dy, r, marker_face in [(0.12, res, COLORS[m]), (-0.12, res_unw, "white")]:
             a = r["models"][m]
-            lo, hi = a["auuc_per_1m_ci"]
-            ax.hlines(i + dy, lo, hi, color=COLORS[m], lw=2)
-            ax.plot(a["auuc_per_1m"], i + dy, "o", color=COLORS[m], markersize=8,
-                    markerfacecolor=COLORS[m] if filled else "white", markeredgewidth=2)
+            lo, hi = (v * 1e6 for v in a["auuc_ci"])
+            ax.errorbar(a["auuc"] * 1e6, i + dy, xerr=[[a["auuc"] * 1e6 - lo], [hi - a["auuc"] * 1e6]],
+                        fmt="o", color=COLORS[m], mfc=marker_face, capsize=3)
     ax.axvline(0, color=NEUTRAL, lw=1, ls="--")
     ax.set_yticks(range(len(ms)), [LABELS[m] for m in ms])
-    ax.set_xlabel("AUUC: area above random, incremental visits per 1M users")
-    ax.set_title("AUUC with 95% CI (filled: propensity-weighted, hollow: unweighted)")
+    ax.set_xlabel("AUUC (incremental visits per 1M users above random)")
+    ax.set_title("AUUC with 95% CI (filled = propensity-weighted, open = unweighted)", fontsize=10)
     ax.grid(axis="y", visible=False)
     fig.savefig(path)
     plt.close(fig)
@@ -277,7 +289,7 @@ def run(tag: str = "full") -> tuple[dict, dict]:
     res_unw = evaluate(test, seeds, weighted=False)
     res_conv = evaluate(test, seeds, outcome="conversion", weighted=True)
     suffix = "" if tag == "full" else f"_{tag}"
-    plot_curves(res, FIGURES_DIR / f"qini_curves{suffix}.png")
+    plot_curves(res, FIGURES_DIR / f"qini_curves{suffix}.png", FIGURES_DIR / f"qini_all_models{suffix}.png")
     plot_auuc(res, res_unw, FIGURES_DIR / f"auuc_forest{suffix}.png")
     reps = res.pop("_replicates")
     boot_path(tag).parent.mkdir(parents=True, exist_ok=True)

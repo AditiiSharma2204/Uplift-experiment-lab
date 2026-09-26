@@ -105,19 +105,14 @@ def plot_balance(bal: pd.DataFrame, path=None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     b = bal.iloc[::-1]
     fig, ax = plt.subplots(figsize=(6.5, 4.2))
-    ax.axvspan(-SMD_THRESHOLD, SMD_THRESHOLD, color=NEUTRAL, alpha=0.08, lw=0)
-    ax.axvline(0, color=NEUTRAL, lw=1)
+    ax.axvline(0, color="black", lw=0.8)
     for x in (-SMD_THRESHOLD, SMD_THRESHOLD):
         ax.axvline(x, color=NEUTRAL, lw=1, ls="--")
-    ax.hlines(b["feature"], 0, b["smd"], color=SERIES[0], lw=2)
-    ax.plot(b["smd"], b["feature"], "o", color=SERIES[0], markersize=8,
-            markeredgecolor="white", markeredgewidth=2)
+    ax.plot(b["smd"], b["feature"], "o", color=SERIES[0])
     lim = max(0.12, float(b["smd"].abs().max()) * 1.2)
     ax.set_xlim(-lim, lim)
     ax.set_xlabel("Standardized mean difference (treated - control)")
-    n_out = int((bal["smd"].abs() > SMD_THRESHOLD).sum())
-    verdict = "every feature inside" if n_out == 0 else f"{n_out} feature(s) outside"
-    ax.set_title(f"Covariate balance: {verdict} the +/-{SMD_THRESHOLD} band")
+    ax.set_title(f"Standardized mean difference, treated vs control (dashed: +/-{SMD_THRESHOLD})")
     ax.grid(axis="y", visible=False)
     fig.savefig(path)
     plt.close(fig)

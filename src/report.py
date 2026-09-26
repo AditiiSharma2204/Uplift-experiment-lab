@@ -177,6 +177,7 @@ A model-light cross-check (compare the arms within 20 bins of predicted visit pr
 
 AUUC is the area between the uplift curve and random targeting, in incremental visits per 1M users. The model was selected on
 validation; on test the X- and S-learners are statistically tied (paired bootstrap, Bonferroni-corrected).
+All four learners on one chart: [results/figures/qini_all_models.png](results/figures/qini_all_models.png).
 
 **Why not just target likely visitors?** The response model's whole-curve AUUC is close to the uplift learners', but at the top
 of the ranking, where budgets bind, it falls behind. Uplift in the top 5% is {up5_resp} {up5_resp_ci} for the response model vs

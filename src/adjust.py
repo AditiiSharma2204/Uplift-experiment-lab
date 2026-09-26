@@ -132,17 +132,15 @@ def plot_strata(strata: dict, outcome: str, path=None) -> None:
     x = np.arange(1, len(tab) + 1)
     fig, axes = plt.subplots(1, 2, figsize=(10, 3.8))
     ax = axes[0]
-    ax.plot(x, 100 * tab["treat_share"], "o-", color=SERIES[0], markeredgecolor="white", markeredgewidth=1.5)
+    ax.plot(x, 100 * tab["treat_share"], "o-", color=SERIES[0])
     ax.axhline(85, color=NEUTRAL, ls="--", lw=1)
     ax.text(1, 85.05, "85% design ratio", color=NEUTRAL, fontsize=8, va="bottom")
     ax.set_xlabel(f"Bin of predicted {outcome} probability (low to high)")
     ax.set_ylabel("Treated share (%)")
     ax.set_title("Treated share by predicted-outcome bin")
     ax = axes[1]
-    ax.plot(x, 100 * tab["rate_control"], "o-", color=SERIES[1], markeredgecolor="white",
-            markeredgewidth=1.5, label="Control")
-    ax.plot(x, 100 * tab["rate_treated"], "o-", color=SERIES[0], markeredgecolor="white",
-            markeredgewidth=1.5, label="Treated")
+    ax.plot(x, 100 * tab["rate_control"], "o-", color=SERIES[1], label="Control")
+    ax.plot(x, 100 * tab["rate_treated"], "o-", color=SERIES[0], label="Treated")
     ax.set_yscale("log")
     ax.set_xlabel(f"Bin of predicted {outcome} probability (low to high)")
     ax.set_ylabel(f"{outcome} rate (%, log scale)")

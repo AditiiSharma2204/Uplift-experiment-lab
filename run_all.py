@@ -156,10 +156,11 @@ def stage_s5() -> None:
 
 
 def stage_s6() -> None:
-    from src import report
+    from src import figures, report
 
+    figures.run()
     report.run()
-    print("README.md and docs/memo.md regenerated from results/results.json")
+    print("figures, README.md and docs/memo.md regenerated from saved results")
 
 
 def main() -> None:

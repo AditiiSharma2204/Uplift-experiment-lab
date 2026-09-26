@@ -121,7 +121,7 @@ def plot_power(res: dict, path=None) -> None:
         ax.plot(grid, [analytical_power(n, p_c, eff, res["treat_share"]) for n in grid],
                 color=color, label="Analytical")
         ax.errorbar(tab["n"], tab["simulated_detection_share"], yerr=1.96 * tab["simulated_mc_se"],
-                    fmt="o", color=color, markerfacecolor="white", markeredgewidth=2, markersize=7,
+                    fmt="o", color=color, markerfacecolor="white", markersize=6,
                     capsize=3, lw=1, label=f"Simulated ({res['sim_reps']} subsamples)")
         ax.axhline(POWER, color=NEUTRAL, ls="--", lw=1)
         ax.text(grid[0], POWER + 0.02, "80% power", color=NEUTRAL, fontsize=8)
@@ -141,8 +141,7 @@ def plot_mde(res: dict, path=None) -> None:
     fig, ax = plt.subplots(figsize=(6.5, 3.8))
     for o, color in zip(OUTCOMES, SERIES):
         tab = pd.DataFrame(res[o]["table"])
-        ax.plot(tab["n"], 100 * tab["mde_rel"], "o-", color=color, markeredgecolor="white",
-                markeredgewidth=1.5, markersize=7, label=o)
+        ax.plot(tab["n"], 100 * tab["mde_rel"], "o-", color=color, label=o)
         ax.axhline(100 * res[o]["true_effect_abs"] / res[o]["baseline_rate_control"], color=color,
                    ls=":", lw=1.2)
         last = tab.iloc[0]
