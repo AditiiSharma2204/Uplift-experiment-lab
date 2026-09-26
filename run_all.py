@@ -1,4 +1,4 @@
-"""Run the pipeline stage by stage.  Usage:  python run_all.py --stage s01  (or: all)"""
+"""Run the pipeline stage by stage.  Usage:  python run_all.py --stage s01|s2|s3|s4|s5|s6|all"""
 from __future__ import annotations
 
 import argparse
@@ -155,9 +155,16 @@ def stage_s5() -> None:
     print(json.dumps(res["model_comparison_profit"], indent=1))
 
 
+def stage_s6() -> None:
+    from src import report
+
+    report.run()
+    print("README.md and docs/memo.md regenerated from results/results.json")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--stage", default="all", choices=["s01", "s2", "s3", "s4", "s5", "all"])
+    ap.add_argument("--stage", default="all", choices=["s01", "s2", "s3", "s4", "s5", "s6", "all"])
     ap.add_argument("--dev-n", type=int, default=1_000_000)
     ap.add_argument("--dev", action="store_true", help="stages s3/s4: run on the 1M dev sample")
     ap.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44],
@@ -173,6 +180,8 @@ def main() -> None:
         stage_s4(args.dev)
     if args.stage in ("s5", "all"):
         stage_s5()
+    if args.stage in ("s6", "all"):
+        stage_s6()
 
 
 if __name__ == "__main__":
